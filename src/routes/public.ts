@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest } from 'fastify';
 import { prisma } from '../lib/prisma';
-import { ResponseStatus } from '@prisma/client';
+import { ResponseStatus, MediaInteractionType } from '@prisma/client';
 
 export async function publicRoutes(app: FastifyInstance) {
   // 1. Obter o survey (se publicado) com toda sua estrutura
@@ -124,6 +124,23 @@ export async function publicRoutes(app: FastifyInstance) {
         leftAt: new Date(leftAt),
         timeSpentMs,
         orderIndex
+      }
+    });
+
+    return reply.status(201).send(tracking);
+  });
+
+  // 6. Salvar tracking de interação com mídia
+  app.post('/response/:responseId/track/media', async (request: FastifyRequest<{ Params: { responseId: string }, Body: { mediaId: string; interactionType: MediaInteractionType; timeOffsetMs?: number } }>, reply) => {
+    const { responseId } = request.params;
+    const { mediaId, interactionType, timeOffsetMs } = request.body;
+
+    const tracking = await prisma.mediaInteraction.create({
+      data: {
+        responseId,
+        mediaId,
+        interactionType,
+        timeOffsetMs: timeOffsetMs ? Math.round(timeOffsetMs) : null
       }
     });
 

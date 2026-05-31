@@ -62,4 +62,16 @@ export async function authRoutes(app: FastifyInstance) {
 
     return reply.send({ token });
   });
+
+  app.get('/me', async (request, reply) => {
+    try {
+      await request.jwtVerify();
+    } catch (err) {
+      return reply.send(err);
+    }
+    const userId = (request.user as any).sub;
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true, name: true, email: true } });
+    if (!user) return reply.status(404).send({ message: 'User not found' });
+    return user;
+  });
 }

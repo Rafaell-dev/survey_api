@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest } from 'fastify';
 import { prisma } from '../lib/prisma';
-import { QuestionType } from '@prisma/client';
+import { QuestionType, ScaleVisualType } from '@prisma/client';
 
 const mapType = (type: string): QuestionType => {
   switch (type) {
@@ -8,7 +8,21 @@ const mapType = (type: string): QuestionType => {
     case 'paragraph': return QuestionType.LONG_TEXT;
     case 'multiple_choice': return QuestionType.SINGLE_CHOICE;
     case 'checkboxes': return QuestionType.MULTIPLE_CHOICE;
+    case 'likert': return QuestionType.LIKERT;
+    case 'slider': return QuestionType.SLIDER;
     default: return QuestionType.SHORT_TEXT;
+  }
+};
+
+const mapScaleVisualType = (type?: string): ScaleVisualType | undefined => {
+  if (!type) return undefined;
+  switch (type) {
+    case 'numbers': return ScaleVisualType.NUMBERS;
+    case 'emojis': return ScaleVisualType.EMOJIS;
+    case 'icons': return ScaleVisualType.ICONS;
+    case 'slider': return ScaleVisualType.SLIDER;
+    case 'text_labels': return ScaleVisualType.TEXT_LABELS;
+    default: return undefined;
   }
 };
 
@@ -31,9 +45,9 @@ export async function questionRoutes(app: FastifyInstance) {
   };
 
   // 1. Criar uma nova pergunta em um bloco
-  app.post('/block/:blockId', async (request: FastifyRequest<{ Params: { blockId: string }, Body: { title: string; description?: string; type: string; required?: boolean; options?: string[] } }>, reply) => {
+  app.post('/block/:blockId', async (request: FastifyRequest<{ Params: { blockId: string }, Body: { title: string; description?: string; type: string; required?: boolean; options?: string[]; scaleStart?: number; scaleEnd?: number; scaleVisualType?: string } }>, reply) => {
     const { blockId } = request.params;
-    const { title, description, type, required, options } = request.body;
+    const { title, description, type, required, options, scaleStart, scaleEnd, scaleVisualType } = request.body;
     const userId = (request.user as any).sub;
 
     if (!(await verifyBlockOwnership(blockId, userId))) {
@@ -54,6 +68,9 @@ export async function questionRoutes(app: FastifyInstance) {
         type: mapType(type),
         isRequired: required || false,
         orderIndex,
+        scaleStart,
+        scaleEnd,
+        scaleVisualType: mapScaleVisualType(scaleVisualType),
         options: options ? {
           create: options.map((opt, i) => ({
             label: opt,
@@ -70,7 +87,7 @@ export async function questionRoutes(app: FastifyInstance) {
   });
 
   // 2. Atualizar uma pergunta (e opcionalmente recriar as opções)
-  app.put('/:id', async (request: FastifyRequest<{ Params: { id: string }, Body: { title?: string; description?: string; type?: string; required?: boolean; orderIndex?: number; options?: string[] } }>, reply) => {
+  app.put('/:id', async (request: FastifyRequest<{ Params: { id: string }, Body: { title?: string; description?: string; type?: string; required?: boolean; orderIndex?: number; options?: string[]; scaleStart?: number; scaleEnd?: number; scaleVisualType?: string } }>, reply) => {
     const { id } = request.params;
     const updates = request.body;
     const userId = (request.user as any).sub;
@@ -86,6 +103,9 @@ export async function questionRoutes(app: FastifyInstance) {
       type: updates.type ? mapType(updates.type) : undefined,
       isRequired: updates.required,
       orderIndex: updates.orderIndex,
+      scaleStart: updates.scaleStart,
+      scaleEnd: updates.scaleEnd,
+      scaleVisualType: updates.scaleVisualType ? mapScaleVisualType(updates.scaleVisualType) : undefined,
     };
 
     if (updates.options) {

@@ -1,0 +1,244 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ==========================================
+// ESTRUTURA E CRIAÇÃO DO SURVEY
+// ==========================================
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  surveys   Survey[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Survey {
+  id           String       @id @default(uuid())
+  title        String
+  description  String?
+  instructions String?
+  status       SurveyStatus @default(DRAFT)
+
+  researcherId String
+  researcher   User   @relation(fields: [researcherId], references: [id])
+
+  blocks    Block[]
+  responses SurveyResponse[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum SurveyStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Block {
+  id          String  @id @default(uuid())
+  title       String?
+  description String?
+  orderIndex  Int
+
+  surveyId String
+  survey   Survey @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+
+  questions     Question[]
+  rulesTargeted ConditionalRule[] @relation("TargetBlock")
+  trackings     BlockTracking[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Question {
+  id          String       @id @default(uuid())
+  title       String
+  description String?
+  type        QuestionType
+  isRequired  Boolean      @default(true)
+  orderIndex  Int
+
+  // Configurações avançadas para Escalas Likert/Sliders
+  scaleStart      Int?
+  scaleEnd        Int?
+  scaleVisualType ScaleVisualType?
+
+  blockId String
+  block   Block  @relation(fields: [blockId], references: [id], onDelete: Cascade)
+
+  options QuestionOption[]
+  medias  Media[]
+  rules   ConditionalRule[]
+  answers Answer[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum QuestionType {
+  SHORT_TEXT
+  LONG_TEXT
+  MULTIPLE_CHOICE
+  SINGLE_CHOICE
+  LIKERT
+  SLIDER
+  MEDIA_ONLY
+}
+
+enum ScaleVisualType {
+  NUMBERS
+  EMOJIS
+  ICONS
+  SLIDER
+  TEXT_LABELS
+}
+
+model QuestionOption {
+  id         String @id @default(uuid())
+  label      String
+  value      Int? // Valor numérico obrigatório para análise de escalas (RN03)
+  orderIndex Int
+
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  answers Answer[]
+}
+
+model Media {
+  id       String    @id @default(uuid())
+  type     MediaType
+  url      String
+  fileName String?
+
+  questionId String?
+  question   Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  interactions MediaInteraction[]
+
+  createdAt DateTime @default(now())
+}
+
+enum MediaType {
+  AUDIO
+  VIDEO
+  IMAGE
+}
+
+model ConditionalRule {
+  id         String   @id @default(uuid())
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  operator   RuleOperator
+  matchValue String // O valor esperado (ex: "vermelho" ou ID da opção) para disparar a regra
+
+  targetBlockId String
+  targetBlock   Block  @relation("TargetBlock", fields: [targetBlockId], references: [id], onDelete: Cascade)
+}
+
+enum RuleOperator {
+  EQUALS
+  NOT_EQUALS
+  GREATER_THAN
+  LESS_THAN
+}
+
+// ==========================================
+// TRACKING, COLETA E RESPOSTAS
+// ==========================================
+
+model Participant {
+  id         String  @id @default(uuid())
+  identifier String? // Ex: e-mail, matrícula ou token anônimo
+
+  responses SurveyResponse[]
+
+  createdAt DateTime @default(now())
+}
+
+model SurveyResponse {
+  id          String         @id @default(uuid())
+  status      ResponseStatus @default(IN_PROGRESS)
+  totalTimeMs Int? // Tempo total do survey
+
+  participantId String
+  participant   Participant @relation(fields: [participantId], references: [id])
+
+  surveyId String
+  survey   Survey @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+
+  startedAt  DateTime  @default(now())
+  finishedAt DateTime?
+
+  answers           Answer[]
+  blockTrackings    BlockTracking[]
+  mediaInteractions MediaInteraction[]
+}
+
+enum ResponseStatus {
+  IN_PROGRESS
+  COMPLETED
+}
+
+model Answer {
+  id           String  @id @default(uuid())
+  textValue    String?
+  numericValue Int? // Resposta visual convertida em numérico
+  timeSpentMs  Int? // Tempo gasto apenas nesta pergunta/tela
+
+  responseId String
+  response   SurveyResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  selectedOptionId String?
+  selectedOption   QuestionOption? @relation(fields: [selectedOptionId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model BlockTracking {
+  id          String    @id @default(uuid())
+  enteredAt   DateTime
+  leftAt      DateTime?
+  timeSpentMs Int?
+  orderIndex  Int // Para preservar a exata sequência que o usuário percorreu
+
+  responseId String
+  response   SurveyResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+
+  blockId String
+  block   Block  @relation(fields: [blockId], references: [id], onDelete: Cascade)
+}
+
+model MediaInteraction {
+  id              String               @id @default(uuid())
+  interactionType MediaInteractionType
+  timestamp       DateTime             @default(now())
+  timeOffsetMs    Int? // Em que segundo do vídeo/áudio ocorreu o clique (opcional)
+
+  responseId String
+  response   SurveyResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+
+  mediaId String
+  media   Media  @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+}
+
+enum MediaInteractionType {
+  PLAY
+  PAUSE
+  END
+  CLICK
+}

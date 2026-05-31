@@ -3,6 +3,7 @@ import jwt from '@fastify/jwt';
 import cors from '@fastify/cors';
 import { authRoutes } from './routes/auth';
 import { surveyRoutes } from './routes/survey';
+import { blockRoutes } from './routes/block';
 
 const app: FastifyInstance = fastify({ logger: true });
 
@@ -24,6 +25,7 @@ app.decorate('authenticate', async (request: any, reply: any) => {
 
 app.register(authRoutes, { prefix: '/auth' });
 app.register(surveyRoutes, { prefix: '/surveys' });
+app.register(blockRoutes, { prefix: '/blocks' });
 
 app.get('/ping', async (request, reply) => {
   return { message: 'pong', status: 'API is running successfully!' };

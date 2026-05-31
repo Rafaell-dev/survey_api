@@ -92,6 +92,24 @@ export async function surveyRoutes(app: FastifyInstance) {
     return updated;
   });
 
+  // 4. Publicar um survey
+  app.post('/:id/publish', async (request: FastifyRequest<{ Params: { id: string } }>, reply) => {
+    const { id } = request.params;
+    const userId = (request.user as any).sub;
+
+    const existingSurvey = await prisma.survey.findUnique({ where: { id } });
+    if (!existingSurvey || existingSurvey.researcherId !== userId) {
+      return reply.status(403).send({ message: 'Forbidden or survey not found' });
+    }
+
+    const updated = await prisma.survey.update({
+      where: { id },
+      data: { status: 'PUBLISHED' }
+    });
+
+    return updated;
+  });
+
   // 5. Deletar um survey
   app.delete('/:id', async (request: FastifyRequest<{ Params: { id: string } }>, reply) => {
     const { id } = request.params;

@@ -42,9 +42,9 @@ export async function blockRoutes(app: FastifyInstance) {
   });
 
   // 2. Criar um novo bloco
-  app.post('/survey/:surveyId', async (request: FastifyRequest<{ Params: { surveyId: string }, Body: { title?: string; description?: string; randomizeQuests?: boolean; isControl?: boolean } }>, reply) => {
+  app.post('/survey/:surveyId', async (request: FastifyRequest<{ Params: { surveyId: string }, Body: { title?: string; description?: string } }>, reply) => {
     const { surveyId } = request.params;
-    const { title, description, randomizeQuests, isControl } = request.body;
+    const { title, description } = request.body;
     const userId = (request.user as any).sub;
 
     if (!(await verifySurveyOwnership(surveyId, userId))) {
@@ -64,8 +64,6 @@ export async function blockRoutes(app: FastifyInstance) {
         title: title || 'Novo Bloco',
         description,
         orderIndex,
-        randomizeQuests: randomizeQuests || false,
-        isControl: isControl || false,
       }
     });
 
@@ -73,7 +71,7 @@ export async function blockRoutes(app: FastifyInstance) {
   });
 
   // 3. Atualizar um bloco (incluindo reordenação opcional)
-  app.put('/:id', async (request: FastifyRequest<{ Params: { id: string }, Body: { title?: string; description?: string; orderIndex?: number; randomizeQuests?: boolean; isControl?: boolean } }>, reply) => {
+  app.put('/:id', async (request: FastifyRequest<{ Params: { id: string }, Body: { title?: string; description?: string; orderIndex?: number } }>, reply) => {
     const { id } = request.params;
     const updates = request.body;
     const userId = (request.user as any).sub;

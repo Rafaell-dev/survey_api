@@ -110,4 +110,23 @@ export async function publicRoutes(app: FastifyInstance) {
 
     return updated;
   });
+
+  // 5. Salvar tracking de tempo no bloco
+  app.post('/response/:responseId/track/block', async (request: FastifyRequest<{ Params: { responseId: string }, Body: { blockId: string; enteredAt: string; leftAt: string; timeSpentMs: number; orderIndex: number } }>, reply) => {
+    const { responseId } = request.params;
+    const { blockId, enteredAt, leftAt, timeSpentMs, orderIndex } = request.body;
+
+    const tracking = await prisma.blockTracking.create({
+      data: {
+        responseId,
+        blockId,
+        enteredAt: new Date(enteredAt),
+        leftAt: new Date(leftAt),
+        timeSpentMs,
+        orderIndex
+      }
+    });
+
+    return reply.status(201).send(tracking);
+  });
 }

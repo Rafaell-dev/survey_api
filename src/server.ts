@@ -4,6 +4,7 @@ import cors from '@fastify/cors';
 import { authRoutes } from './routes/auth';
 import { surveyRoutes } from './routes/survey';
 import { blockRoutes } from './routes/block';
+import { questionRoutes } from './routes/question';
 
 const app: FastifyInstance = fastify({ logger: true });
 
@@ -26,6 +27,7 @@ app.decorate('authenticate', async (request: any, reply: any) => {
 app.register(authRoutes, { prefix: '/auth' });
 app.register(surveyRoutes, { prefix: '/surveys' });
 app.register(blockRoutes, { prefix: '/blocks' });
+app.register(questionRoutes, { prefix: '/questions' });
 
 app.get('/ping', async (request, reply) => {
   return { message: 'pong', status: 'API is running successfully!' };

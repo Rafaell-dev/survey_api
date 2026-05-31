@@ -10,6 +10,7 @@ import { blockRoutes } from './routes/block';
 import { questionRoutes } from './routes/question';
 import { mediaRoutes } from './routes/media';
 import { ruleRoutes } from './routes/rule';
+import { publicRoutes } from './routes/public';
 
 const app: FastifyInstance = fastify({ logger: true });
 
@@ -44,6 +45,9 @@ app.register(blockRoutes, { prefix: '/blocks' });
 app.register(questionRoutes, { prefix: '/questions' });
 app.register(mediaRoutes, { prefix: '/media' });
 app.register(ruleRoutes, { prefix: '/rules' });
+
+// Rotas públicas que não requerem autenticação JWT
+app.register(publicRoutes, { prefix: '/public' });
 
 app.get('/ping', async (request, reply) => {
   return { message: 'pong', status: 'API is running successfully!' };

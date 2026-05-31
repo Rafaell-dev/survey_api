@@ -1,10 +1,14 @@
 import fastify, { FastifyInstance } from 'fastify';
 import jwt from '@fastify/jwt';
 import cors from '@fastify/cors';
+import fastifyMultipart from '@fastify/multipart';
+import fastifyStatic from '@fastify/static';
+import path from 'path';
 import { authRoutes } from './routes/auth';
 import { surveyRoutes } from './routes/survey';
 import { blockRoutes } from './routes/block';
 import { questionRoutes } from './routes/question';
+import { mediaRoutes } from './routes/media';
 
 const app: FastifyInstance = fastify({ logger: true });
 
@@ -14,6 +18,15 @@ app.register(cors, {
 
 app.register(jwt, {
   secret: process.env.JWT_SECRET || 'supersecret'
+});
+
+app.register(fastifyMultipart, {
+  limits: { fileSize: 50 * 1024 * 1024 } // 50MB limit
+});
+
+app.register(fastifyStatic, {
+  root: path.join(__dirname, '../uploads'),
+  prefix: '/uploads/',
 });
 
 app.decorate('authenticate', async (request: any, reply: any) => {
@@ -28,6 +41,7 @@ app.register(authRoutes, { prefix: '/auth' });
 app.register(surveyRoutes, { prefix: '/surveys' });
 app.register(blockRoutes, { prefix: '/blocks' });
 app.register(questionRoutes, { prefix: '/questions' });
+app.register(mediaRoutes, { prefix: '/media' });
 
 app.get('/ping', async (request, reply) => {
   return { message: 'pong', status: 'API is running successfully!' };

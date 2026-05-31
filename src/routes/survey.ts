@@ -124,4 +124,65 @@ export async function surveyRoutes(app: FastifyInstance) {
     
     return reply.status(204).send();
   });
+
+  app.get('/:id/export', async (request: FastifyRequest<{ Params: { id: string } }>, reply) => {
+    const { id } = request.params;
+    
+    const survey = await prisma.survey.findUnique({
+      where: { id },
+      include: {
+        blocks: {
+          orderBy: { orderIndex: 'asc' },
+          include: { questions: { orderBy: { orderIndex: 'asc' } } }
+        },
+        responses: {
+          include: { answers: true, blockTrackings: true, mediaInteractions: true }
+        }
+      }
+    });
+
+    if (!survey) return reply.status(404).send({ message: 'Not found' });
+
+    const questions: any[] = [];
+    survey.blocks.forEach(b => questions.push(...b.questions));
+
+    const headers = [
+      'Response ID', 'Participant ID', 'Status', 'Started At', 'Finished At',
+      ...questions.map(q => `"${q.title.replace(/"/g, '""')}"`),
+      'Total Block Time (ms)', 'Media Interactions Count'
+    ];
+
+    const rows = [headers.join(',')];
+
+    for (const resp of survey.responses) {
+      const row = [
+        resp.id,
+        resp.participantId,
+        resp.status,
+        resp.startedAt.toISOString(),
+        resp.finishedAt?.toISOString() || '',
+      ];
+
+      for (const q of questions) {
+        const answer = resp.answers.find(a => a.questionId === q.id);
+        let val = '';
+        if (answer) {
+          if (answer.textValue !== null) val = answer.textValue;
+          else if (answer.numericValue !== null) val = String(answer.numericValue);
+        }
+        row.push(`"${val.replace(/"/g, '""')}"`);
+      }
+
+      const totalTime = resp.blockTrackings.reduce((acc, bt) => acc + (bt.timeSpentMs || 0), 0);
+      row.push(String(totalTime));
+      row.push(String(resp.mediaInteractions.length));
+
+      rows.push(row.join(','));
+    }
+
+    const csvStr = rows.join('\n');
+    reply.header('Content-Type', 'text/csv; charset=utf-8');
+    reply.header('Content-Disposition', `attachment; filename="survey_${id}_export.csv"`);
+    return reply.send(csvStr);
+  });
 }

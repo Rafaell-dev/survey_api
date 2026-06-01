@@ -20,6 +20,7 @@ FROM node:20-alpine AS runner
 
 WORKDIR /app
 
+ENV DATABASE_URL=$DATABASE_URL
 ENV NODE_ENV=production
 ENV PORT=3333
 

@@ -4,6 +4,8 @@ import cors from '@fastify/cors';
 import fastifyMultipart from '@fastify/multipart';
 import fastifyStatic from '@fastify/static';
 import path from 'path';
+import fastifySwagger from '@fastify/swagger';
+import fastifyApiReference from '@scalar/fastify-api-reference';
 import { authRoutes } from './modules/auth/auth.routes';
 import { surveysRoutes } from './modules/surveys/surveys.routes';
 import { blocksRoutes } from './modules/blocks/blocks.routes';
@@ -31,6 +33,36 @@ app.register(fastifyStatic, {
   prefix: '/uploads/',
 });
 
+app.register(fastifySwagger, {
+  openapi: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Survey API',
+      description: 'Documentação da API de Pesquisas com Fastify e Scalar',
+      version: '1.0.0'
+    },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT'
+        }
+      }
+    }
+  }
+});
+
+app.register(fastifyApiReference, {
+  routePrefix: '/docs',
+  configuration: {
+    theme: 'purple',
+    spec: {
+      content: () => app.swagger()
+    }
+  }
+});
+
 app.decorate('authenticate', async (request: any, reply: any) => {
   try {
     await request.jwtVerify();
@@ -49,7 +81,21 @@ app.register(ruleRoutes, { prefix: '/rules' });
 // Rotas públicas que não requerem autenticação JWT
 app.register(publicRoutes, { prefix: '/public' });
 
-app.get('/ping', async (request, reply) => {
+app.get('/ping', {
+  schema: {
+    description: 'Verifica se a API está online',
+    tags: ['Sistema'],
+    response: {
+      200: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' },
+          status: { type: 'string' }
+        }
+      }
+    }
+  }
+}, async (request, reply) => {
   return { message: 'pong', status: 'API is running successfully!' };
 });
 

@@ -5,7 +5,7 @@ import fastifyMultipart from '@fastify/multipart';
 import fastifyStatic from '@fastify/static';
 import path from 'path';
 import { authRoutes } from './modules/auth/auth.routes';
-import { surveyRoutes } from './routes/survey';
+import { surveysRoutes } from './modules/surveys/surveys.routes';
 import { blockRoutes } from './routes/block';
 import { questionRoutes } from './routes/question';
 import { mediaRoutes } from './routes/media';
@@ -40,7 +40,7 @@ app.decorate('authenticate', async (request: any, reply: any) => {
 });
 
 app.register(authRoutes, { prefix: '/auth' });
-app.register(surveyRoutes, { prefix: '/surveys' });
+app.register(surveysRoutes, { prefix: '/surveys' });
 app.register(blockRoutes, { prefix: '/blocks' });
 app.register(questionRoutes, { prefix: '/questions' });
 app.register(mediaRoutes, { prefix: '/media' });

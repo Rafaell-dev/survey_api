@@ -4,7 +4,7 @@ import cors from '@fastify/cors';
 import fastifyMultipart from '@fastify/multipart';
 import fastifyStatic from '@fastify/static';
 import path from 'path';
-import { authRoutes } from './routes/auth';
+import { authRoutes } from './modules/auth/auth.routes';
 import { surveyRoutes } from './routes/survey';
 import { blockRoutes } from './routes/block';
 import { questionRoutes } from './routes/question';
@@ -15,7 +15,7 @@ import { publicRoutes } from './routes/public';
 const app: FastifyInstance = fastify({ logger: true });
 
 app.register(cors, { 
-  origin: process.env.CORS_ORIGIN 
+  origin: process.env.CORS_ORIGIN || '*'
 });
 
 app.register(jwt, {

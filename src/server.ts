@@ -10,6 +10,7 @@ import { authRoutes } from './modules/auth/auth.routes';
 import { surveysRoutes } from './modules/surveys/surveys.routes';
 import { blocksRoutes } from './modules/blocks/blocks.routes';
 import { questionsRoutes } from './modules/questions/questions.routes';
+import { scaleOptionsRoutes } from './modules/scale-options/scale-options.routes';
 import { mediaRoutes } from './routes/media';
 import { ruleRoutes } from './routes/rule';
 import { publicRoutes } from './routes/public';
@@ -75,6 +76,7 @@ app.register(authRoutes, { prefix: '/auth' });
 app.register(surveysRoutes, { prefix: '/surveys' });
 app.register(blocksRoutes);
 app.register(questionsRoutes);
+app.register(scaleOptionsRoutes);
 app.register(mediaRoutes, { prefix: '/media' });
 app.register(ruleRoutes, { prefix: '/rules' });
 

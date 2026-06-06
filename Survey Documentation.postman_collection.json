@@ -921,6 +921,101 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Scale Options",
+      "item": [
+        {
+          "name": "Create Scale Options",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"options\": [\n    {\n      \"numericValue\": 1,\n      \"emoji\": \"😡\"\n    },\n    {\n      \"numericValue\": 2,\n      \"emoji\": \"😕\"\n    },\n    {\n      \"numericValue\": 3,\n      \"emoji\": \"😐\"\n    },\n    {\n      \"numericValue\": 4,\n      \"emoji\": \"🙂\"\n    },\n    {\n      \"numericValue\": 5,\n      \"emoji\": \"😍\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/questions/:questionId/scale-options",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "questions",
+                ":questionId",
+                "scale-options"
+              ],
+              "variable": [
+                {
+                  "key": "questionId",
+                  "value": "<question-id>"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Scale Options",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"options\": [\n    {\n      \"numericValue\": 1,\n      \"label\": \"Discordo totalmente\"\n    },\n    {\n      \"numericValue\": 5,\n      \"label\": \"Concordo totalmente\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/questions/:questionId/scale-options",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "questions",
+                ":questionId",
+                "scale-options"
+              ],
+              "variable": [
+                {
+                  "key": "questionId",
+                  "value": "<question-id>"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Scale Options",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/questions/:questionId/scale-options",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "questions",
+                ":questionId",
+                "scale-options"
+              ],
+              "variable": [
+                {
+                  "key": "questionId",
+                  "value": "<question-id>"
+                }
+              ]
+            }
+          }
+        }
+      ]
     }
   ],
   "auth": {

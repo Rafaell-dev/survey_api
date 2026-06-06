@@ -7,7 +7,7 @@ import path from 'path';
 import { authRoutes } from './modules/auth/auth.routes';
 import { surveysRoutes } from './modules/surveys/surveys.routes';
 import { blocksRoutes } from './modules/blocks/blocks.routes';
-import { questionRoutes } from './routes/question';
+import { questionsRoutes } from './modules/questions/questions.routes';
 import { mediaRoutes } from './routes/media';
 import { ruleRoutes } from './routes/rule';
 import { publicRoutes } from './routes/public';
@@ -42,7 +42,7 @@ app.decorate('authenticate', async (request: any, reply: any) => {
 app.register(authRoutes, { prefix: '/auth' });
 app.register(surveysRoutes, { prefix: '/surveys' });
 app.register(blocksRoutes);
-app.register(questionRoutes, { prefix: '/questions' });
+app.register(questionsRoutes);
 app.register(mediaRoutes, { prefix: '/media' });
 app.register(ruleRoutes, { prefix: '/rules' });
 

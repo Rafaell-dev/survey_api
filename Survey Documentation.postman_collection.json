@@ -2018,6 +2018,45 @@
           }
         }
       ]
+    },
+    {
+      "name": "Media Interactions",
+      "item": [
+        {
+          "name": "Save Media Interactions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"interactions\": [\n    {\n      \"mediaId\": \"<media-id>\",\n      \"interactionType\": \"PLAY\",\n      \"timeOffsetMs\": 0\n    },\n    {\n      \"mediaId\": \"<media-id>\",\n      \"interactionType\": \"PAUSE\",\n      \"timeOffsetMs\": 32000\n    },\n    {\n      \"mediaId\": \"<media-id>\",\n      \"interactionType\": \"END\",\n      \"timeOffsetMs\": 60000\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{URL}}/public/responses/:responseId/media-interactions",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "public",
+                "responses",
+                ":responseId",
+                "media-interactions"
+              ],
+              "variable": [
+                {
+                  "key": "responseId",
+                  "value": "<response-id>"
+                }
+              ]
+            }
+          }
+        }
+      ]
     }
   ],
   "auth": {

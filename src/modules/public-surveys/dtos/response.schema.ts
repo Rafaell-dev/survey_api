@@ -31,5 +31,18 @@ export const saveTrackingSchema = z.object({
   message: 'Não é permitido orderIndex duplicado na requisição'
 });
 
+export const saveMediaInteractionsSchema = z.object({
+  interactions: z.array(
+    z.object({
+      mediaId: z.string().uuid('ID da mídia inválido'),
+      interactionType: z.enum(['PLAY', 'PAUSE', 'END', 'CLICK'], {
+        message: 'Tipo de interação inválido. Deve ser PLAY, PAUSE, END ou CLICK'
+      }),
+      timeOffsetMs: z.number().int().min(0, 'Tempo não pode ser negativo').optional()
+    })
+  ).min(1, 'A lista de interações não pode estar vazia')
+});
+
 export type SaveAnswerDto = z.infer<typeof saveAnswerSchema>;
 export type SaveTrackingDto = z.infer<typeof saveTrackingSchema>;
+export type SaveMediaInteractionsDto = z.infer<typeof saveMediaInteractionsSchema>;

@@ -1,5 +1,5 @@
 import { prisma } from '../../../lib/prisma';
-import { ResponseStatus } from '@prisma/client';
+import { ResponseStatus, MediaInteractionType } from '@prisma/client';
 
 export interface SaveAnswerData {
   textValue?: string;
@@ -163,5 +163,18 @@ export class PublicSurveyRepository {
 
       return created.count;
     });
+  }
+
+  async saveMediaInteractions(responseId: string, interactions: { mediaId: string; interactionType: MediaInteractionType; timeOffsetMs?: number }[]) {
+    const created = await prisma.mediaInteraction.createMany({
+      data: interactions.map(i => ({
+        responseId,
+        mediaId: i.mediaId,
+        interactionType: i.interactionType,
+        timeOffsetMs: i.timeOffsetMs ?? null
+      }))
+    });
+
+    return created.count;
   }
 }

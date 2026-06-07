@@ -1797,6 +1797,188 @@
           }
         }
       ]
+    },
+    {
+      "name": "Participants & Responses",
+      "item": [
+        {
+          "name": "Save Answer (Text)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionId\": \"<question-id>\",\n  \"textValue\": \"Minha resposta em texto\",\n  \"timeSpentMs\": 5000\n}"
+            },
+            "url": {
+              "raw": "{{URL}}/public/responses/:responseId/answers",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "public",
+                "responses",
+                ":responseId",
+                "answers"
+              ],
+              "variable": [
+                {
+                  "key": "responseId",
+                  "value": "<response-id>"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Save Answer (Single/Multiple)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionId\": \"<question-id>\",\n  \"selectedOptionId\": \"<option-id>\",\n  \"selectedOptionsIds\": [\n    \"<opt1>\",\n    \"<opt2>\"\n  ],\n  \"timeSpentMs\": 3000\n}"
+            },
+            "url": {
+              "raw": "{{URL}}/public/responses/:responseId/answers",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "public",
+                "responses",
+                ":responseId",
+                "answers"
+              ],
+              "variable": [
+                {
+                  "key": "responseId",
+                  "value": "<response-id>"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Save Answer (Scale/Likert)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionId\": \"<question-id>\",\n  \"numericValue\": 5,\n  \"timeSpentMs\": 4000\n}"
+            },
+            "url": {
+              "raw": "{{URL}}/public/responses/:responseId/answers",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "public",
+                "responses",
+                ":responseId",
+                "answers"
+              ],
+              "variable": [
+                {
+                  "key": "responseId",
+                  "value": "<response-id>"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Answers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{URL}}/public/responses/:responseId/answers",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "public",
+                "responses",
+                ":responseId",
+                "answers"
+              ],
+              "variable": [
+                {
+                  "key": "responseId",
+                  "value": "<response-id>"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Next Block (Engine)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{URL}}/public/responses/:responseId/next-block",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "public",
+                "responses",
+                ":responseId",
+                "next-block"
+              ],
+              "variable": [
+                {
+                  "key": "responseId",
+                  "value": "<response-id>"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Finish Survey",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{URL}}/public/responses/:responseId/finish",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "public",
+                "responses",
+                ":responseId",
+                "finish"
+              ],
+              "variable": [
+                {
+                  "key": "responseId",
+                  "value": "<response-id>"
+                }
+              ]
+            }
+          }
+        }
+      ]
     }
   ],
   "auth": {

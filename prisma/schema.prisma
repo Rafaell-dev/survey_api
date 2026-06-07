@@ -258,6 +258,7 @@ model Answer {
 
   selectedOptionId String?
   selectedOption   QuestionOption? @relation(fields: [selectedOptionId], references: [id])
+  selectedOptionsIds String[]
 
   createdAt DateTime @default(now())
 }

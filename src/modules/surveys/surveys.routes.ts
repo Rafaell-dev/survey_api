@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { SurveysController } from './controllers/surveys.controller';
+import { AnalyticsController } from './controllers/analytics.controller';
 import { jwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 export async function surveysRoutes(app: FastifyInstance) {
@@ -14,4 +15,11 @@ export async function surveysRoutes(app: FastifyInstance) {
   app.patch('/:surveyId', surveysController.update.bind(surveysController));
   app.patch('/:surveyId/settings', surveysController.updateSettings.bind(surveysController));
   app.delete('/:surveyId', surveysController.archive.bind(surveysController));
+
+  // Analytics
+  const analyticsController = new AnalyticsController();
+  app.get('/:surveyId/analytics/overview', analyticsController.getOverview.bind(analyticsController));
+  app.get('/:surveyId/analytics/questions', analyticsController.getQuestionsAnalytics.bind(analyticsController));
+  app.get('/:surveyId/analytics/navigation', analyticsController.getNavigationAnalytics.bind(analyticsController));
+  app.get('/:surveyId/analytics/media', analyticsController.getMediaAnalytics.bind(analyticsController));
 }

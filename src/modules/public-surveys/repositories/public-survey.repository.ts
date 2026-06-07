@@ -141,4 +141,27 @@ export class PublicSurveyRepository {
       }
     });
   }
+
+  async saveBlockTrackings(responseId: string, blocks: { blockId: string; orderIndex: number; timeSpentMs: number }[]) {
+    const now = new Date();
+    
+    return prisma.$transaction(async (tx) => {
+      await tx.blockTracking.deleteMany({
+        where: { responseId }
+      });
+
+      const created = await tx.blockTracking.createMany({
+        data: blocks.map(b => ({
+          responseId,
+          blockId: b.blockId,
+          orderIndex: b.orderIndex,
+          timeSpentMs: b.timeSpentMs,
+          enteredAt: now,
+          leftAt: now
+        }))
+      });
+
+      return created.count;
+    });
+  }
 }

@@ -1979,6 +1979,45 @@
           }
         }
       ]
+    },
+    {
+      "name": "Tracking",
+      "item": [
+        {
+          "name": "Save Navigation Tracking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"blocks\": [\n    {\n      \"blockId\": \"<block-id>\",\n      \"orderIndex\": 1,\n      \"timeSpentMs\": 15000\n    },\n    {\n      \"blockId\": \"<block-id-2>\",\n      \"orderIndex\": 2,\n      \"timeSpentMs\": 22000\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{URL}}/public/responses/:responseId/tracking",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "public",
+                "responses",
+                ":responseId",
+                "tracking"
+              ],
+              "variable": [
+                {
+                  "key": "responseId",
+                  "value": "<response-id>"
+                }
+              ]
+            }
+          }
+        }
+      ]
     }
   ],
   "auth": {

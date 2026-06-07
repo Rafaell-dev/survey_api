@@ -12,4 +12,5 @@ export async function publicSurveyRoutes(app: FastifyInstance) {
   app.get('/public/responses/:responseId/answers', controller.listAnswers.bind(controller));
   app.get('/public/responses/:responseId/next-block', controller.getNextBlock.bind(controller));
   app.post('/public/responses/:responseId/finish', controller.finishResponse.bind(controller));
+  app.post('/public/responses/:responseId/tracking', controller.saveTracking.bind(controller));
 }

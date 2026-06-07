@@ -7,7 +7,8 @@ import { SaveAnswerService } from '../services/save-answer.service';
 import { ListAnswersService } from '../services/list-answers.service';
 import { GetNextBlockService } from '../services/get-next-block.service';
 import { FinishResponseService } from '../services/finish-response.service';
-import { saveAnswerSchema } from '../dtos/response.schema';
+import { SaveTrackingService } from '../services/save-tracking.service';
+import { saveAnswerSchema, saveTrackingSchema } from '../dtos/response.schema';
 
 export class PublicSurveyController {
   private repository = new PublicSurveyRepository();
@@ -87,6 +88,21 @@ export class PublicSurveyController {
       const service = new FinishResponseService(this.repository);
       const result = await service.execute(request.params.responseId);
       return reply.status(200).send(result);
+    } catch (err: any) {
+      return reply.status(err.status || 500).send({ message: err.message });
+    }
+  }
+
+  async saveTracking(request: FastifyRequest<{ Params: { responseId: string } }>, reply: FastifyReply) {
+    const parseResult = saveTrackingSchema.safeParse(request.body);
+    if (!parseResult.success) {
+      return reply.status(400).send({ message: 'Payload inválido', errors: parseResult.error.format() });
+    }
+
+    try {
+      const service = new SaveTrackingService(this.repository);
+      const result = await service.execute(request.params.responseId, parseResult.data);
+      return reply.status(201).send(result);
     } catch (err: any) {
       return reply.status(err.status || 500).send({ message: err.message });
     }

@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { SurveysController } from './controllers/surveys.controller';
 import { AnalyticsController } from './controllers/analytics.controller';
+import { ExportController } from './controllers/export.controller';
 import { jwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 export async function surveysRoutes(app: FastifyInstance) {
@@ -22,4 +23,9 @@ export async function surveysRoutes(app: FastifyInstance) {
   app.get('/:surveyId/analytics/questions', analyticsController.getQuestionsAnalytics.bind(analyticsController));
   app.get('/:surveyId/analytics/navigation', analyticsController.getNavigationAnalytics.bind(analyticsController));
   app.get('/:surveyId/analytics/media', analyticsController.getMediaAnalytics.bind(analyticsController));
+
+  // Exports
+  const exportController = new ExportController();
+  app.get('/:surveyId/export/csv', exportController.exportCsv.bind(exportController));
+  app.get('/:surveyId/export/xlsx', exportController.exportXlsx.bind(exportController));
 }

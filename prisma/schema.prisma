@@ -39,6 +39,9 @@ model Survey {
   instructions String?
   status       SurveyStatus @default(DRAFT)
 
+  participantIdentificationType ParticipantIdentificationType @default(ANONYMOUS)
+  allowMultipleResponses        Boolean                       @default(true)
+
   researcherId String
   researcher   User   @relation(fields: [researcherId], references: [id])
 
@@ -53,6 +56,14 @@ enum SurveyStatus {
   DRAFT
   PUBLISHED
   ARCHIVED
+}
+
+enum ParticipantIdentificationType {
+  ANONYMOUS
+  EMAIL
+  PHONE
+  EMAIL_OR_PHONE
+  NAME_AND_EMAIL
 }
 
 model Block {
@@ -200,7 +211,9 @@ enum RuleOperator {
 
 model Participant {
   id         String  @id @default(uuid())
-  identifier String? // Ex: e-mail, matrícula ou token anônimo
+  name       String?
+  email      String?
+  phone      String?
 
   responses SurveyResponse[]
 

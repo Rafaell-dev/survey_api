@@ -24,10 +24,27 @@ export class PublicSurveyRepository {
     });
   }
 
-  async createParticipant(identifier?: string) {
+  async createParticipant(data: { name?: string, email?: string, phone?: string }) {
     return prisma.participant.create({
       data: {
-        identifier: identifier || null
+        name: data.name || null,
+        email: data.email || null,
+        phone: data.phone || null
+      }
+    });
+  }
+
+  async findResponseByEmailOrPhone(surveyId: string, email?: string, phone?: string) {
+    if (!email && !phone) return null;
+    return prisma.surveyResponse.findFirst({
+      where: {
+        surveyId,
+        participant: {
+          OR: [
+            ...(email ? [{ email }] : []),
+            ...(phone ? [{ phone }] : [])
+          ]
+        }
       }
     });
   }

@@ -5,7 +5,8 @@ import { ListSurveysService } from '../services/list-surveys.service';
 import { GetSurveyService } from '../services/get-survey.service';
 import { UpdateSurveyService } from '../services/update-survey.service';
 import { ArchiveSurveyService } from '../services/archive-survey.service';
-import { createSurveySchema, listSurveysSchema, updateSurveySchema } from '../dtos/survey.schema';
+import { UpdateSurveySettingsService } from '../services/update-survey-settings.service';
+import { createSurveySchema, listSurveysSchema, updateSurveySchema, updateSurveySettingsSchema } from '../dtos/survey.schema';
 
 export class SurveysController {
   private repository = new PrismaSurveyRepository();
@@ -75,6 +76,22 @@ export class SurveysController {
       const researcherId = (request.user as any).sub;
       await service.execute(request.params.surveyId, researcherId);
       return reply.status(200).send({ success: true });
+    } catch (err: any) {
+      return reply.status(err.status || 500).send({ message: err.message });
+    }
+  }
+
+  async updateSettings(request: FastifyRequest<{ Params: { surveyId: string } }>, reply: FastifyReply) {
+    const parseResult = updateSurveySettingsSchema.safeParse(request.body);
+    if (!parseResult.success) {
+      return reply.status(400).send({ message: 'Payload inválido', errors: parseResult.error.format() });
+    }
+
+    try {
+      const service = new UpdateSurveySettingsService(this.repository);
+      const researcherId = (request.user as any).sub;
+      const result = await service.execute(request.params.surveyId, parseResult.data, researcherId);
+      return reply.status(200).send(result);
     } catch (err: any) {
       return reply.status(err.status || 500).send({ message: err.message });
     }

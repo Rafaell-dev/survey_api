@@ -23,8 +23,8 @@ export class CreateBlockService {
       throw err;
     }
 
-    if (survey.status === 'ARCHIVED') {
-      const err = new Error('Não é possível adicionar blocos a um survey arquivado');
+    if (survey.status !== 'DRAFT') {
+      const err = new Error('Survey already published and cannot be structurally modified.');
       (err as any).status = 409;
       throw err;
     }

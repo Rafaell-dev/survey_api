@@ -18,8 +18,8 @@ export class DeleteBlockService {
       throw err;
     }
 
-    if (block.survey.status === 'ARCHIVED') {
-      const err = new Error('Não é possível excluir blocos de um survey arquivado');
+    if (block.survey.status !== 'DRAFT') {
+      const err = new Error('Survey already published and cannot be structurally modified.');
       (err as any).status = 409;
       throw err;
     }

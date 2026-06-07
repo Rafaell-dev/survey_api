@@ -11,6 +11,7 @@ import { surveysRoutes } from './modules/surveys/surveys.routes';
 import { blocksRoutes } from './modules/blocks/blocks.routes';
 import { questionsRoutes } from './modules/questions/questions.routes';
 import { scaleOptionsRoutes } from './modules/scale-options/scale-options.routes';
+import { surveyPublicationRoutes } from './modules/surveys/survey-publication.routes';
 import { questionOptionRoutes } from './modules/question-option/question-option.routes';
 import { mediaRoutes } from './modules/media/media.routes';
 import { conditionalRuleRoutes } from './modules/conditional-rules/conditional-rule.routes';
@@ -75,6 +76,7 @@ app.decorate('authenticate', async (request: any, reply: any) => {
 
 app.register(authRoutes, { prefix: '/auth' });
 app.register(surveysRoutes, { prefix: '/surveys' });
+app.register(surveyPublicationRoutes);
 app.register(blocksRoutes);
 app.register(questionsRoutes);
 app.register(scaleOptionsRoutes);

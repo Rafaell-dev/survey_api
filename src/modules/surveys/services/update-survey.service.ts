@@ -19,9 +19,9 @@ export class UpdateSurveyService {
       throw err;
     }
 
-    if (survey.status !== 'DRAFT') {
-      const err = new Error('Apenas surveys DRAFT podem ser editados livremente');
-      (err as any).status = 400;
+    if (survey.status === 'ARCHIVED') {
+      const err = new Error('Surveys arquivados não podem ser editados');
+      (err as any).status = 409;
       throw err;
     }
 

@@ -1,6 +1,14 @@
 import { prisma } from '../../../lib/prisma';
 import { ResponseStatus } from '@prisma/client';
 
+export interface SaveAnswerData {
+  textValue?: string;
+  numericValue?: number;
+  selectedOptionId?: string;
+  selectedOptionsIds?: string[];
+  timeSpentMs: number;
+}
+
 export class PublicSurveyRepository {
   async findPublishedSurveyById(id: string) {
     return prisma.survey.findUnique({
@@ -82,6 +90,54 @@ export class PublicSurveyRepository {
             }
           }
         }
+      }
+    });
+  }
+
+  async findQuestionById(id: string) {
+    return prisma.question.findUnique({
+      where: { id }
+    });
+  }
+
+  async saveAnswer(responseId: string, questionId: string, data: SaveAnswerData) {
+    const existing = await prisma.answer.findFirst({
+      where: { responseId, questionId }
+    });
+
+    if (existing) {
+      return prisma.answer.update({
+        where: { id: existing.id },
+        data: {
+          textValue: data.textValue ?? null,
+          numericValue: data.numericValue ?? null,
+          selectedOptionId: data.selectedOptionId ?? null,
+          selectedOptionsIds: data.selectedOptionsIds ?? [],
+          timeSpentMs: data.timeSpentMs
+        }
+      });
+    }
+
+    return prisma.answer.create({
+      data: {
+        responseId,
+        questionId,
+        textValue: data.textValue,
+        numericValue: data.numericValue,
+        selectedOptionId: data.selectedOptionId,
+        selectedOptionsIds: data.selectedOptionsIds ?? [],
+        timeSpentMs: data.timeSpentMs
+      }
+    });
+  }
+
+  async completeResponse(responseId: string, totalTimeMs: number) {
+    return prisma.surveyResponse.update({
+      where: { id: responseId },
+      data: {
+        status: ResponseStatus.COMPLETED,
+        finishedAt: new Date(),
+        totalTimeMs
       }
     });
   }

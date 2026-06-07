@@ -8,4 +8,8 @@ export async function publicSurveyRoutes(app: FastifyInstance) {
   app.post('/public/surveys/:surveyId/start', controller.startSurvey.bind(controller));
   
   app.get('/public/responses/:responseId', controller.resumeSurvey.bind(controller));
+  app.post('/public/responses/:responseId/answers', controller.saveAnswer.bind(controller));
+  app.get('/public/responses/:responseId/answers', controller.listAnswers.bind(controller));
+  app.get('/public/responses/:responseId/next-block', controller.getNextBlock.bind(controller));
+  app.post('/public/responses/:responseId/finish', controller.finishResponse.bind(controller));
 }

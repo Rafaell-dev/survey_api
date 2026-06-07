@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ParticipantIdentificationType } from '@prisma/client';
 
 export const createSurveySchema = z.object({
   title: z.string().min(3, 'O título deve ter no mínimo 3 caracteres').max(255, 'O título deve ter no máximo 255 caracteres'),
@@ -23,4 +24,13 @@ export const listSurveysSchema = z.object({
 
 export type CreateSurveyDto = z.infer<typeof createSurveySchema>;
 export type UpdateSurveyDto = z.infer<typeof updateSurveySchema>;
+
+export const updateSurveySettingsSchema = z.object({
+  participantIdentificationType: z.nativeEnum(ParticipantIdentificationType).optional(),
+  allowMultipleResponses: z.boolean().optional()
+}).refine(data => data.participantIdentificationType !== undefined || data.allowMultipleResponses !== undefined, {
+  message: 'Pelo menos um campo deve ser enviado para atualização'
+});
+
+export type UpdateSurveySettingsDto = z.infer<typeof updateSurveySettingsSchema>;
 export type ListSurveysDto = z.infer<typeof listSurveysSchema>;

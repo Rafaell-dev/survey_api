@@ -1750,7 +1750,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"identifier\": \"participante@email.com\"\n}"
+              "raw": "{\n  \"name\": \"João Silva\",\n  \"email\": \"joao.silva@email.com\",\n  \"phone\": \"+5511999999999\"\n}"
             },
             "url": {
               "raw": "{{URL}}/public/surveys/:surveyId/start",

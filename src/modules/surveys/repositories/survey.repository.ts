@@ -15,6 +15,11 @@ export interface UpdateSurveyInput {
   status?: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
 }
 
+export interface UpdateSurveySettingsInput {
+  participantIdentificationType?: 'ANONYMOUS' | 'EMAIL' | 'PHONE' | 'EMAIL_OR_PHONE' | 'NAME_AND_EMAIL';
+  allowMultipleResponses?: boolean;
+}
+
 export interface ListSurveysFilters {
   researcherId: string;
   page: number;
@@ -28,6 +33,7 @@ export interface SurveyRepository {
   findMany(filters: ListSurveysFilters): Promise<Survey[]>;
   count(filters: ListSurveysFilters): Promise<number>;
   update(id: string, data: UpdateSurveyInput): Promise<Survey>;
+  updateSettings(id: string, data: UpdateSurveySettingsInput): Promise<Survey>;
 }
 
 export class PrismaSurveyRepository implements SurveyRepository {
@@ -75,6 +81,13 @@ export class PrismaSurveyRepository implements SurveyRepository {
   }
 
   async update(id: string, data: UpdateSurveyInput): Promise<Survey> {
+    return prisma.survey.update({
+      where: { id },
+      data
+    });
+  }
+
+  async updateSettings(id: string, data: UpdateSurveySettingsInput): Promise<Survey> {
     return prisma.survey.update({
       where: { id },
       data

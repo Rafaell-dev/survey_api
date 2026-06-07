@@ -88,6 +88,8 @@ model Question {
   blockId String
   block   Block  @relation(fields: [blockId], references: [id], onDelete: Cascade)
 
+  scaleOptions QuestionScaleOption[]
+
   options QuestionOption[]
   medias  Media[]
   rules   ConditionalRule[]
@@ -113,6 +115,26 @@ enum ScaleVisualType {
   ICONS
   SLIDER
   TEXT_LABELS
+}
+
+model QuestionScaleOption {
+  id String @id @default(uuid())
+
+  numericValue Int
+
+  label String?
+  emoji String?
+  icon String?
+
+  orderIndex Int
+
+  questionId String
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([questionId])
+  @@unique([questionId, numericValue])
 }
 
 model QuestionOption {

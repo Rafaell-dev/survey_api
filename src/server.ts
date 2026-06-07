@@ -12,7 +12,7 @@ import { blocksRoutes } from './modules/blocks/blocks.routes';
 import { questionsRoutes } from './modules/questions/questions.routes';
 import { scaleOptionsRoutes } from './modules/scale-options/scale-options.routes';
 import { questionOptionRoutes } from './modules/question-option/question-option.routes';
-import { mediaRoutes } from './routes/media';
+import { mediaRoutes } from './modules/media/media.routes';
 import { ruleRoutes } from './routes/rule';
 import { publicRoutes } from './routes/public';
 
@@ -27,7 +27,7 @@ app.register(jwt, {
 });
 
 app.register(fastifyMultipart, {
-  limits: { fileSize: 50 * 1024 * 1024 } // 50MB limit
+  limits: { fileSize: 200 * 1024 * 1024 } // 200MB limit
 });
 
 app.register(fastifyStatic, {
@@ -79,7 +79,7 @@ app.register(blocksRoutes);
 app.register(questionsRoutes);
 app.register(scaleOptionsRoutes);
 app.register(questionOptionRoutes);
-app.register(mediaRoutes, { prefix: '/media' });
+app.register(mediaRoutes);
 app.register(ruleRoutes, { prefix: '/rules' });
 
 // Rotas públicas que não requerem autenticação JWT

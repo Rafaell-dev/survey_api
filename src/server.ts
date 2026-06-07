@@ -13,7 +13,7 @@ import { questionsRoutes } from './modules/questions/questions.routes';
 import { scaleOptionsRoutes } from './modules/scale-options/scale-options.routes';
 import { questionOptionRoutes } from './modules/question-option/question-option.routes';
 import { mediaRoutes } from './modules/media/media.routes';
-import { ruleRoutes } from './routes/rule';
+import { conditionalRuleRoutes } from './modules/conditional-rules/conditional-rule.routes';
 import { publicRoutes } from './routes/public';
 
 const app: FastifyInstance = fastify({ logger: true });
@@ -80,7 +80,7 @@ app.register(questionsRoutes);
 app.register(scaleOptionsRoutes);
 app.register(questionOptionRoutes);
 app.register(mediaRoutes);
-app.register(ruleRoutes, { prefix: '/rules' });
+app.register(conditionalRuleRoutes);
 
 // Rotas públicas que não requerem autenticação JWT
 app.register(publicRoutes, { prefix: '/public' });

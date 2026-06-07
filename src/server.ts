@@ -15,6 +15,7 @@ import { surveyPublicationRoutes } from './modules/surveys/survey-publication.ro
 import { questionOptionRoutes } from './modules/question-option/question-option.routes';
 import { mediaRoutes } from './modules/media/media.routes';
 import { conditionalRuleRoutes } from './modules/conditional-rules/conditional-rule.routes';
+import { publicSurveyRoutes } from './modules/public-surveys/public-survey.routes';
 import { publicRoutes } from './routes/public';
 
 const app: FastifyInstance = fastify({ logger: true });
@@ -85,6 +86,7 @@ app.register(mediaRoutes);
 app.register(conditionalRuleRoutes);
 
 // Rotas públicas que não requerem autenticação JWT
+app.register(publicSurveyRoutes);
 app.register(publicRoutes, { prefix: '/public' });
 
 app.get('/ping', {

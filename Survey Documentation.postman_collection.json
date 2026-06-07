@@ -1710,6 +1710,93 @@
           }
         }
       ]
+    },
+    {
+      "name": "Public Surveys",
+      "item": [
+        {
+          "name": "Get Public Survey",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{URL}}/public/surveys/:surveyId",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "public",
+                "surveys",
+                ":surveyId"
+              ],
+              "variable": [
+                {
+                  "key": "surveyId",
+                  "value": "<survey-id>"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Start Survey",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"participante@email.com\"\n}"
+            },
+            "url": {
+              "raw": "{{URL}}/public/surveys/:surveyId/start",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "public",
+                "surveys",
+                ":surveyId",
+                "start"
+              ],
+              "variable": [
+                {
+                  "key": "surveyId",
+                  "value": "<survey-id>"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Resume Survey Session",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{URL}}/public/responses/:responseId",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "public",
+                "responses",
+                ":responseId"
+              ],
+              "variable": [
+                {
+                  "key": "responseId",
+                  "value": "<response-id>"
+                }
+              ]
+            }
+          }
+        }
+      ]
     }
   ],
   "auth": {

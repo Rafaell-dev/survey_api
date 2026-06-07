@@ -37,8 +37,8 @@ export class UploadMediaService {
       throw err;
     }
 
-    if (question.block.survey.status === 'ARCHIVED') {
-      const err = new Error('Não é possível adicionar mídia em um survey arquivado');
+    if (question.block.survey.status !== 'DRAFT') {
+      const err = new Error('Survey already published and cannot be structurally modified.');
       (err as any).status = 409;
       throw err;
     }

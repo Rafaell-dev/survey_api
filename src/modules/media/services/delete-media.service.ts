@@ -28,8 +28,8 @@ export class DeleteMediaService {
       throw err;
     }
 
-    if (media.question.block.survey.status === 'ARCHIVED') {
-      const err = new Error('Não é possível excluir mídia de um survey arquivado');
+    if (media.question.block.survey.status !== 'DRAFT') {
+      const err = new Error('Survey already published and cannot be structurally modified.');
       (err as any).status = 409;
       throw err;
     }

@@ -2057,6 +2057,131 @@
           }
         }
       ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "Get Overview",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{URL}}/surveys/:surveyId/analytics/overview",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "surveys",
+                ":surveyId",
+                "analytics",
+                "overview"
+              ],
+              "variable": [
+                {
+                  "key": "surveyId",
+                  "value": "<survey-id>"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Questions Analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{URL}}/surveys/:surveyId/analytics/questions",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "surveys",
+                ":surveyId",
+                "analytics",
+                "questions"
+              ],
+              "variable": [
+                {
+                  "key": "surveyId",
+                  "value": "<survey-id>"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Navigation Analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{URL}}/surveys/:surveyId/analytics/navigation",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "surveys",
+                ":surveyId",
+                "analytics",
+                "navigation"
+              ],
+              "variable": [
+                {
+                  "key": "surveyId",
+                  "value": "<survey-id>"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Media Analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{URL}}/surveys/:surveyId/analytics/media",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "surveys",
+                ":surveyId",
+                "analytics",
+                "media"
+              ],
+              "variable": [
+                {
+                  "key": "surveyId",
+                  "value": "<survey-id>"
+                }
+              ]
+            }
+          }
+        }
+      ]
     }
   ],
   "auth": {

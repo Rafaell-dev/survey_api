@@ -150,10 +150,16 @@ model QuestionOption {
 }
 
 model Media {
-  id       String    @id @default(uuid())
-  type     MediaType
-  url      String
-  fileName String?
+  id         String    @id @default(uuid())
+  type       MediaType
+
+  url        String
+  fileName   String?
+
+  mimeType   String?
+  fileSize   Int?
+
+  storageKey String?
 
   questionId String?
   question   Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)

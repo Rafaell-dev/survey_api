@@ -10,6 +10,28 @@ export interface SaveAnswerData {
 }
 
 export class PublicSurveyRepository {
+  async findBySlug(slug: string) {
+    return prisma.survey.findUnique({
+      where: { publicSlug: slug },
+      include: {
+        blocks: {
+          orderBy: { orderIndex: 'asc' },
+          include: {
+            questions: {
+              orderBy: { orderIndex: 'asc' },
+              include: {
+                options: { orderBy: { orderIndex: 'asc' } },
+                scaleOptions: { orderBy: { orderIndex: 'asc' } },
+                rules: true,
+                medias: true,
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
   async findPublishedSurveyById(id: string) {
     return prisma.survey.findUnique({
       where: { id },

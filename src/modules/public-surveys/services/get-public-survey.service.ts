@@ -4,20 +4,22 @@ import { stripAdminFields } from '../utils/strip-admin-fields';
 export class GetPublicSurveyService {
   constructor(private repository: PublicSurveyRepository) {}
 
-  async execute(surveyId: string) {
-    const survey = await this.repository.findPublishedSurveyById(surveyId);
+  async execute(slug: string) {
+    const survey = await this.repository.findBySlug(slug);
 
-    if (!survey || survey.status === 'DRAFT') {
-      const err = new Error('Survey not found');
+    if (!survey) {
+      const err = new Error('Survey não encontrado');
       (err as any).status = 404;
       throw err;
     }
 
-    if (survey.status === 'ARCHIVED') {
-      const err = new Error('Survey arquivado e não está mais disponível');
-      (err as any).status = 410;
+    if (survey.status !== 'PUBLISHED' || !survey.publicLinkActive) {
+      const err = new Error('Survey não encontrado');
+      (err as any).status = 404;
       throw err;
     }
+
+
 
     return stripAdminFields(survey);
   }

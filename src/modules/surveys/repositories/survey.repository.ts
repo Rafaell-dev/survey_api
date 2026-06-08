@@ -61,6 +61,7 @@ export class PrismaSurveyRepository implements SurveyRepository {
     return prisma.survey.findMany({
       where: {
         researcherId,
+        status: { not: 'ARCHIVED' },
         ...(search ? { title: { contains: search, mode: 'insensitive' } } : {})
       },
       orderBy: { createdAt: 'desc' },
@@ -75,6 +76,7 @@ export class PrismaSurveyRepository implements SurveyRepository {
     return prisma.survey.count({
       where: {
         researcherId,
+        status: { not: 'ARCHIVED' },
         ...(search ? { title: { contains: search, mode: 'insensitive' } } : {})
       }
     });

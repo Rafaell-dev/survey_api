@@ -21,7 +21,8 @@ import { publicRoutes } from './routes/public';
 const app: FastifyInstance = fastify({ logger: true });
 
 app.register(cors, { 
-  origin: process.env.CORS_ORIGIN || '*'
+  origin: process.env.CORS_ORIGIN || '*',
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
 });
 
 app.register(jwt, {

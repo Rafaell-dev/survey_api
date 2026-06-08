@@ -39,6 +39,9 @@ model Survey {
   instructions String?
   status       SurveyStatus @default(DRAFT)
 
+  publicSlug       String?  @unique
+  publicLinkActive Boolean  @default(false)
+
   participantIdentificationType ParticipantIdentificationType @default(ANONYMOUS)
   allowMultipleResponses        Boolean                       @default(true)
 

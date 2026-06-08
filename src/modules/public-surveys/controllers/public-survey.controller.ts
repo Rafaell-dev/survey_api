@@ -14,10 +14,10 @@ import { saveAnswerSchema, saveTrackingSchema, saveMediaInteractionsSchema } fro
 export class PublicSurveyController {
   private repository = new PublicSurveyRepository();
 
-  async getSurvey(request: FastifyRequest<{ Params: { surveyId: string } }>, reply: FastifyReply) {
+  async getSurvey(request: FastifyRequest<{ Params: { slug: string } }>, reply: FastifyReply) {
     try {
       const service = new GetPublicSurveyService(this.repository);
-      const result = await service.execute(request.params.surveyId);
+      const result = await service.execute(request.params.slug);
       return reply.status(200).send(result);
     } catch (err: any) {
       return reply.status(err.status || 500).send({ message: err.message });

@@ -2247,6 +2247,106 @@
           }
         }
       ]
+    },
+    {
+      "name": "Public Links",
+      "item": [
+        {
+          "name": "Get Public Link",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{URL}}/surveys/:surveyId/public-link",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "surveys",
+                ":surveyId",
+                "public-link"
+              ],
+              "variable": [
+                {
+                  "key": "surveyId",
+                  "value": "<survey-id>"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Generate / Regenerate Link",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{URL}}/surveys/:surveyId/public-link",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "surveys",
+                ":surveyId",
+                "public-link"
+              ],
+              "variable": [
+                {
+                  "key": "surveyId",
+                  "value": "<survey-id>"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Link Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"publicLinkActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{URL}}/surveys/:surveyId/public-link",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "surveys",
+                ":surveyId",
+                "public-link"
+              ],
+              "variable": [
+                {
+                  "key": "surveyId",
+                  "value": "<survey-id>"
+                }
+              ]
+            }
+          }
+        }
+      ]
     }
   ],
   "auth": {

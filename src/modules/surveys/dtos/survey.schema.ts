@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ParticipantIdentificationType } from '@prisma/client';
+import { ParticipantIdentificationType, QuestionType, ScaleVisualType } from '@prisma/client';
 
 export const createSurveySchema = z.object({
   title: z.string().min(3, 'O título deve ter no mínimo 3 caracteres').max(255, 'O título deve ter no máximo 255 caracteres'),
@@ -34,3 +34,37 @@ export const updateSurveySettingsSchema = z.object({
 
 export type UpdateSurveySettingsDto = z.infer<typeof updateSurveySettingsSchema>;
 export type ListSurveysDto = z.infer<typeof listSurveysSchema>;
+
+export const syncSurveySchema = z.object({
+  deletedBlockIds: z.array(z.string()),
+  deletedQuestionIds: z.array(z.string()),
+  deletedOptionIds: z.array(z.string()),
+  blocks: z.array(z.object({
+    id: z.string(),
+    isNew: z.boolean().optional(),
+    title: z.string().nullable().optional(),
+    description: z.string().nullable().optional(),
+    orderIndex: z.number().int(),
+    questions: z.array(z.object({
+      id: z.string(),
+      isNew: z.boolean().optional(),
+      title: z.string(),
+      description: z.string().nullable().optional(),
+      type: z.nativeEnum(QuestionType),
+      isRequired: z.boolean(),
+      orderIndex: z.number().int(),
+      scaleStart: z.number().int().nullable().optional(),
+      scaleEnd: z.number().int().nullable().optional(),
+      scaleVisualType: z.nativeEnum(ScaleVisualType).nullable().optional(),
+      options: z.array(z.object({
+        id: z.string(),
+        isNew: z.boolean().optional(),
+        label: z.string(),
+        value: z.number().nullable().optional(),
+        orderIndex: z.number().int()
+      }))
+    }))
+  }))
+});
+
+export type SyncSurveyDto = z.infer<typeof syncSurveySchema>;

@@ -32,5 +32,5 @@ COPY --from=builder /app/prisma ./prisma
 
 EXPOSE 3333
 
-# The start command defined in package.json is "node dist/server.js"
-CMD ["npm", "start"]
+# Run database migrations before starting the server
+CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]

@@ -33,4 +33,4 @@ COPY --from=builder /app/prisma ./prisma
 EXPOSE 3333
 
 # Run database migrations before starting the server
-CMD ["npm", "start"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]

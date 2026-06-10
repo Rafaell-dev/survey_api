@@ -34,5 +34,5 @@ COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 EXPOSE 3333
 
 # Run database schema sync before starting the server
-CMD ["sh", "-c", "npx prisma db push --skip-generate && npm start"]
+CMD ["sh", "-c", "npx prisma db push && npm start"]
 

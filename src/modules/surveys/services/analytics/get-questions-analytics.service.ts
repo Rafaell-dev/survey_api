@@ -15,7 +15,12 @@ export class GetQuestionsAnalyticsService {
         const answers = q.answers;
         if (answers.length === 0) continue; // RN08
 
-        const base = { questionId: q.id, type: q.type };
+        const base = { 
+          questionId: q.id, 
+          type: q.type,
+          questionTitle: q.title,
+          blockTitle: block.title || `Bloco ${block.orderIndex + 1}`
+        };
 
         if (q.type === 'SINGLE_CHOICE') {
           const counts: Record<string, number> = {};

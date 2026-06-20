@@ -3,6 +3,7 @@ import { SurveysController } from './controllers/surveys.controller';
 import { AnalyticsController } from './controllers/analytics.controller';
 import { ExportController } from './controllers/export.controller';
 import { PublicLinkController } from './controllers/public-link.controller';
+import { ReportController } from './controllers/report.controller';
 import { jwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 export async function surveysRoutes(app: FastifyInstance) {
@@ -30,6 +31,14 @@ export async function surveysRoutes(app: FastifyInstance) {
   const exportController = new ExportController();
   app.get('/:surveyId/export/csv', exportController.exportCsv.bind(exportController));
   app.get('/:surveyId/export/xlsx', exportController.exportXlsx.bind(exportController));
+
+  // Reports
+  const reportController = new ReportController();
+  app.get('/:surveyId/reports', reportController.list.bind(reportController));
+  app.post('/:surveyId/reports', reportController.create.bind(reportController));
+  app.get('/:surveyId/reports/:reportId', reportController.get.bind(reportController));
+  app.put('/:surveyId/reports/:reportId', reportController.update.bind(reportController));
+  app.delete('/:surveyId/reports/:reportId', reportController.delete.bind(reportController));
 
   // Public Links
   const publicLinkController = new PublicLinkController();

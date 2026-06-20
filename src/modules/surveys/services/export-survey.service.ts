@@ -29,7 +29,7 @@ export class ExportSurveyService {
       { header: 'Phone', key: 'phone' },
       { header: 'Started At', key: 'startedAt' },
       { header: 'Finished At', key: 'finishedAt' },
-      { header: 'Total Time (ms)', key: 'totalTimeMs' },
+      { header: 'Total Time', key: 'totalTimeFormatted' },
     ];
 
     const dynamicHeaders: { header: string, key: string }[] = [];
@@ -52,7 +52,14 @@ export class ExportSurveyService {
         phone: response.participant?.phone || '',
         startedAt: response.startedAt ? response.startedAt.toISOString() : '',
         finishedAt: response.finishedAt ? response.finishedAt.toISOString() : '',
-        totalTimeMs: response.totalTimeMs ?? ''
+        totalTimeFormatted: (() => {
+          if (typeof response.totalTimeMs !== 'number') return '';
+          const totalSeconds = Math.round(response.totalTimeMs / 1000);
+          if (totalSeconds < 60) return `${totalSeconds}s`;
+          const minutes = Math.floor(totalSeconds / 60);
+          const seconds = totalSeconds % 60;
+          return `${minutes}m ${seconds}s`;
+        })()
       };
 
       for (const q of questionsFlat) {

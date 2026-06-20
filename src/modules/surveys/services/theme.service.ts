@@ -1,17 +1,16 @@
 import { ThemeRepository } from '../repositories/theme.repository';
 import { SurveyRepository } from '../repositories/survey.repository';
 import { UpdateThemeDTO } from '../dtos/theme.dto';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as util from 'util';
-import { pipeline } from 'stream';
+import { StorageProvider } from '../../../providers/storage/StorageProvider';
+import { randomUUID } from 'crypto';
 
 const pump = util.promisify(pipeline);
 
 export class ThemeService {
   constructor(
     private themeRepository: ThemeRepository,
-    private surveysRepository: SurveyRepository
+    private surveysRepository: SurveyRepository,
+    private storageProvider: StorageProvider
   ) {}
 
   async getTheme(surveyId: string, researcherId: string) {
@@ -31,19 +30,13 @@ export class ThemeService {
   async uploadHeaderImage(surveyId: string, researcherId: string, file: any) {
     await this.validateSurveyAccess(surveyId, researcherId);
 
-    const uploadsDir = path.join(process.cwd(), 'uploads', 'themes');
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
-    }
+    const buffer = await file.toBuffer();
+    const extension = file.filename.split('.').pop();
+    const uuid = randomUUID();
+    const key = `surveys/${surveyId}/themes/${uuid}.${extension}`;
 
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    const extension = path.extname(file.filename);
-    const fileName = `header-${surveyId}-${uniqueSuffix}${extension}`;
-    const filePath = path.join(uploadsDir, fileName);
+    const url = await this.storageProvider.upload(buffer, key, file.mimetype);
 
-    await pump(file.file, fs.createWriteStream(filePath));
-
-    const url = `/uploads/themes/${fileName}`;
     return this.themeRepository.upsert(surveyId, { headerImage: url });
   }
 

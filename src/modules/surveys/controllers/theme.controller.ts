@@ -3,12 +3,17 @@ import { ThemeRepository } from '../repositories/theme.repository';
 import { PrismaSurveyRepository } from '../repositories/survey.repository';
 import { ThemeService } from '../services/theme.service';
 import { UpdateThemeDTO } from '../dtos/theme.dto';
+import { CloudflareR2StorageProvider } from '../../../providers/storage/CloudflareR2StorageProvider';
 
 export class ThemeController {
   private service: ThemeService;
 
   constructor() {
-    this.service = new ThemeService(new ThemeRepository(), new PrismaSurveyRepository());
+    this.service = new ThemeService(
+      new ThemeRepository(), 
+      new PrismaSurveyRepository(),
+      new CloudflareR2StorageProvider()
+    );
   }
 
   async get(request: FastifyRequest<{ Params: { surveyId: string } }>, reply: FastifyReply) {

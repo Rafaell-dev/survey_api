@@ -31,6 +31,8 @@ export async function surveysRoutes(app: FastifyInstance) {
   const exportController = new ExportController();
   app.get('/:surveyId/export/csv', exportController.exportCsv.bind(exportController));
   app.get('/:surveyId/export/xlsx', exportController.exportXlsx.bind(exportController));
+  app.get('/:surveyId/reports/:reportId/export/csv', exportController.exportReportCsv.bind(exportController));
+  app.get('/:surveyId/reports/:reportId/export/xlsx', exportController.exportReportXlsx.bind(exportController));
 
   // Reports
   const reportController = new ReportController();

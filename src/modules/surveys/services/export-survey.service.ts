@@ -4,7 +4,7 @@ import { ExportRepository } from '../repositories/export.repository';
 export class ExportSurveyService {
   constructor(private repository: ExportRepository) {}
 
-  async execute(surveyId: string, researcherId: string, format: 'CSV' | 'XLSX'): Promise<Buffer> {
+  async execute(surveyId: string, researcherId: string, format: 'CSV' | 'XLSX', filters?: any): Promise<Buffer> {
     const survey = await this.repository.findSurveyExportData(surveyId);
 
     if (!survey) {
@@ -35,8 +35,16 @@ export class ExportSurveyService {
     const dynamicHeaders: { header: string, key: string }[] = [];
     const questionsFlat: any[] = [];
 
-    for (const block of survey.blocks) {
+    let blocksToExport = survey.blocks;
+    if (filters?.blockIds && filters.blockIds.length > 0 && !filters.blockIds.includes('ALL')) {
+      blocksToExport = blocksToExport.filter(b => filters.blockIds.includes(b.id));
+    }
+
+    for (const block of blocksToExport) {
       for (const q of block.questions) {
+        if (filters?.selectedQuestions && filters.selectedQuestions.length > 0) {
+          if (!filters.selectedQuestions.includes(q.id)) continue;
+        }
         dynamicHeaders.push({ header: q.title || `Question ${q.id}`, key: `q_${q.id}` });
         questionsFlat.push(q);
       }
@@ -44,7 +52,33 @@ export class ExportSurveyService {
 
     sheet.columns = [...fixedHeaders, ...dynamicHeaders];
 
-    for (const response of survey.responses) {
+    let responsesToExport = survey.responses;
+
+    if (filters) {
+      if (filters.status === 'COMPLETED') {
+        responsesToExport = responsesToExport.filter(r => r.finishedAt !== null);
+      } else if (filters.status === 'IN_PROGRESS') {
+        responsesToExport = responsesToExport.filter(r => r.finishedAt === null);
+      }
+
+      if (filters.dateRange?.from) {
+        const fromDate = new Date(filters.dateRange.from);
+        responsesToExport = responsesToExport.filter(r => r.startedAt && new Date(r.startedAt) >= fromDate);
+      }
+      if (filters.dateRange?.to) {
+        const toDate = new Date(filters.dateRange.to);
+        toDate.setHours(23, 59, 59, 999);
+        responsesToExport = responsesToExport.filter(r => r.startedAt && new Date(r.startedAt) <= toDate);
+      }
+
+      if (filters.participantIds && filters.participantIds.length > 0) {
+        responsesToExport = responsesToExport.filter(r => 
+          r.participant && filters.participantIds.includes(r.participant.id)
+        );
+      }
+    }
+
+    for (const response of responsesToExport) {
       const rowData: any = {
         participantId: response.participant?.id || 'Anonymous',
         name: response.participant?.name || '',

@@ -1,16 +1,14 @@
-import { ThemeRepository } from '../repositories/theme.repository';
-import { SurveyRepository } from '../repositories/survey.repository';
-import { UpdateThemeDTO } from '../dtos/theme.dto';
-import { StorageProvider } from '../../../providers/storage/StorageProvider';
-import { randomUUID } from 'crypto';
-
-const pump = util.promisify(pipeline);
+import { ThemeRepository } from "../repositories/theme.repository";
+import { SurveyRepository } from "../repositories/survey.repository";
+import { UpdateThemeDTO } from "../dtos/theme.dto";
+import { StorageProvider } from "../../../providers/storage/StorageProvider";
+import { randomUUID } from "crypto";
 
 export class ThemeService {
   constructor(
     private themeRepository: ThemeRepository,
     private surveysRepository: SurveyRepository,
-    private storageProvider: StorageProvider
+    private storageProvider: StorageProvider,
   ) {}
 
   async getTheme(surveyId: string, researcherId: string) {
@@ -22,7 +20,11 @@ export class ThemeService {
     return theme;
   }
 
-  async updateTheme(surveyId: string, researcherId: string, data: UpdateThemeDTO) {
+  async updateTheme(
+    surveyId: string,
+    researcherId: string,
+    data: UpdateThemeDTO,
+  ) {
     await this.validateSurveyAccess(surveyId, researcherId);
     return this.themeRepository.upsert(surveyId, data);
   }
@@ -31,7 +33,7 @@ export class ThemeService {
     await this.validateSurveyAccess(surveyId, researcherId);
 
     const buffer = await file.toBuffer();
-    const extension = file.filename.split('.').pop();
+    const extension = file.filename.split(".").pop();
     const uuid = randomUUID();
     const key = `surveys/${surveyId}/themes/${uuid}.${extension}`;
 
@@ -43,7 +45,7 @@ export class ThemeService {
   private async validateSurveyAccess(surveyId: string, researcherId: string) {
     const survey = await this.surveysRepository.findById(surveyId);
     if (!survey || survey.researcherId !== researcherId) {
-      const err = new Error('Access denied to survey');
+      const err = new Error("Access denied to survey");
       (err as any).status = 403;
       throw err;
     }

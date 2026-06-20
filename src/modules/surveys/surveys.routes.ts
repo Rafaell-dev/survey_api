@@ -8,13 +8,14 @@ import { ThemeController } from './controllers/theme.controller';
 import { jwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 export async function surveysRoutes(app: FastifyInstance) {
-  const surveysController = new SurveysController();
-
   // Aplica o guard em todas as rotas deste plugin
   app.addHook('preHandler', jwtAuthGuard);
 
+  // Surveys
+  const surveysController = new SurveysController();
   app.post('/', surveysController.create.bind(surveysController));
   app.get('/', surveysController.list.bind(surveysController));
+  app.get('/metrics', surveysController.getMetrics.bind(surveysController));
   app.get('/:surveyId', surveysController.get.bind(surveysController));
   app.patch('/:surveyId', surveysController.update.bind(surveysController));
   app.patch('/:surveyId/settings', surveysController.updateSettings.bind(surveysController));

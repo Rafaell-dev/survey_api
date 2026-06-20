@@ -34,6 +34,7 @@ export interface SurveyRepository {
   count(filters: ListSurveysFilters): Promise<number>;
   update(id: string, data: UpdateSurveyInput): Promise<Survey>;
   updateSettings(id: string, data: UpdateSurveySettingsInput): Promise<Survey>;
+  getGlobalMetrics(researcherId: string): Promise<{ totalResponses: number, newResponses7Days: number }>;
 }
 
 export class PrismaSurveyRepository implements SurveyRepository {
@@ -94,5 +95,27 @@ export class PrismaSurveyRepository implements SurveyRepository {
       where: { id },
       data
     });
+  }
+
+  async getGlobalMetrics(researcherId: string): Promise<{ totalResponses: number, newResponses7Days: number }> {
+    const totalResponses = await prisma.surveyResponse.count({
+      where: {
+        survey: { researcherId },
+        status: 'COMPLETED'
+      }
+    });
+
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    const newResponses7Days = await prisma.surveyResponse.count({
+      where: {
+        survey: { researcherId },
+        status: 'COMPLETED',
+        finishedAt: { gte: sevenDaysAgo }
+      }
+    });
+
+    return { totalResponses, newResponses7Days };
   }
 }

@@ -7,6 +7,7 @@ import { UpdateSurveyService } from '../services/update-survey.service';
 import { ArchiveSurveyService } from '../services/archive-survey.service';
 import { UpdateSurveySettingsService } from '../services/update-survey-settings.service';
 import { SyncSurveyService } from '../services/sync-survey.service';
+import { GetGlobalMetricsService } from '../services/get-global-metrics.service';
 import { createSurveySchema, listSurveysSchema, updateSurveySchema, updateSurveySettingsSchema, syncSurveySchema } from '../dtos/survey.schema';
 
 export class SurveysController {
@@ -108,6 +109,17 @@ export class SurveysController {
       const service = new SyncSurveyService();
       const researcherId = (request.user as any).sub;
       const result = await service.execute(request.params.surveyId, parseResult.data, researcherId);
+      return reply.status(200).send(result);
+    } catch (err: any) {
+      return reply.status(err.status || 500).send({ message: err.message });
+    }
+  }
+
+  async getMetrics(request: FastifyRequest, reply: FastifyReply) {
+    try {
+      const service = new GetGlobalMetricsService(this.repository);
+      const researcherId = (request.user as any).sub;
+      const result = await service.execute(researcherId);
       return reply.status(200).send(result);
     } catch (err: any) {
       return reply.status(err.status || 500).send({ message: err.message });

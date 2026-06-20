@@ -14,6 +14,7 @@ export class PublicSurveyRepository {
     return prisma.survey.findUnique({
       where: { publicSlug: slug },
       include: {
+        theme: true,
         blocks: {
           orderBy: { orderIndex: 'asc' },
           include: {
@@ -36,6 +37,7 @@ export class PublicSurveyRepository {
     return prisma.survey.findUnique({
       where: { id },
       include: {
+        theme: true,
         blocks: {
           orderBy: { orderIndex: 'asc' },
           include: {

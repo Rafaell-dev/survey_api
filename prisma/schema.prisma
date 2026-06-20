@@ -51,6 +51,7 @@ model Survey {
   blocks    Block[]
   responses SurveyResponse[]
   reports   Report[]
+  theme     SurveyTheme?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -315,4 +316,28 @@ model Report {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// ==========================================
+// TEMA / CUSTOMIZAÇÃO
+// ==========================================
+
+model SurveyTheme {
+  id              String  @id @default(uuid())
+  primaryColor    String  @default("#000000")
+  backgroundColor String  @default("#ffffff")
+  textColor       String  @default("#000000")
+  buttonColor     String  @default("#000000")
+  fontFamily      String  @default("Inter")
+  headerImage     String?
+  layout          ThemeLayout @default(CARD)
+
+  surveyId String @unique
+  survey   Survey @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+}
+
+enum ThemeLayout {
+  CARD
+  FULL_PAGE
+  COMPACT
 }

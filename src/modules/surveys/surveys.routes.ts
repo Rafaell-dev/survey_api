@@ -4,6 +4,7 @@ import { AnalyticsController } from './controllers/analytics.controller';
 import { ExportController } from './controllers/export.controller';
 import { PublicLinkController } from './controllers/public-link.controller';
 import { ReportController } from './controllers/report.controller';
+import { ThemeController } from './controllers/theme.controller';
 import { jwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 export async function surveysRoutes(app: FastifyInstance) {
@@ -47,4 +48,10 @@ export async function surveysRoutes(app: FastifyInstance) {
   app.get('/:surveyId/public-link', publicLinkController.getLink.bind(publicLinkController));
   app.post('/:surveyId/public-link', publicLinkController.generateLink.bind(publicLinkController));
   app.patch('/:surveyId/public-link', publicLinkController.updateStatus.bind(publicLinkController));
+
+  // Themes
+  const themeController = new ThemeController();
+  app.get('/:surveyId/theme', themeController.get.bind(themeController));
+  app.put('/:surveyId/theme', themeController.update.bind(themeController));
+  app.post('/:surveyId/theme/media', themeController.uploadMedia.bind(themeController));
 }

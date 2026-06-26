@@ -27,7 +27,7 @@ export class ReorderBlocksService {
     }
 
     if (survey.status !== 'DRAFT') {
-      const err = new Error('Survey already published and cannot be structurally modified.');
+      const err = new Error('O formulário já está publicado e não pode ser modificado estruturalmente.');
       (err as any).status = 409;
       throw err;
     }

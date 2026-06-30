@@ -1,5 +1,6 @@
 import { PublicSurveyRepository } from '../repositories/public-survey.repository';
 import { SaveTrackingDto } from '../dtos/response.schema';
+import { redis } from '../../../lib/redis';
 
 export class SaveTrackingService {
   constructor(private repository: PublicSurveyRepository) {}
@@ -26,12 +27,12 @@ export class SaveTrackingService {
       }
     }
 
-    // RN08 e RN09: Persistência com drop and insert transacional
-    const blocksSaved = await this.repository.saveBlockTrackings(responseId, data.blocks);
+    // Salvar no Redis ao invés do banco (Cache temporário com TTL de 48h)
+    await redis.setex(`tracking:blocks:${responseId}`, 48 * 60 * 60, JSON.stringify(data.blocks));
 
     return {
       responseId,
-      blocksSaved
+      blocksSaved: data.blocks.length
     };
   }
 }

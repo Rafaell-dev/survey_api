@@ -1,5 +1,6 @@
 import { PublicSurveyRepository } from '../repositories/public-survey.repository';
 import { SaveMediaInteractionsDto } from '../dtos/response.schema';
+import { redis } from '../../../lib/redis';
 
 export class SaveMediaInteractionsService {
   constructor(private repository: PublicSurveyRepository) {}
@@ -30,11 +31,17 @@ export class SaveMediaInteractionsService {
       }
     }
 
-    const interactionsSaved = await this.repository.saveMediaInteractions(responseId, data.interactions);
+    // Salvar no Redis usando List (para evitar race conditions em disparos simultâneos)
+    const pipeline = redis.pipeline();
+    for (const interaction of data.interactions) {
+      pipeline.rpush(`tracking:media:${responseId}`, JSON.stringify(interaction));
+    }
+    pipeline.expire(`tracking:media:${responseId}`, 48 * 60 * 60); // 48 horas de TTL
+    await pipeline.exec();
 
     return {
       responseId,
-      interactionsSaved
+      interactionsSaved: data.interactions.length
     };
   }
 }

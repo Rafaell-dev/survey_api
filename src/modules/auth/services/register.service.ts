@@ -25,7 +25,9 @@ export class RegisterService {
       select: {
         id: true,
         name: true,
-        email: true
+        email: true,
+        role: true,
+        status: true
       }
     });
 

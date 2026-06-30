@@ -29,6 +29,12 @@ export class RefreshTokenService {
       throw err;
     }
 
+    if (session.user.status === 'BLOCKED') {
+      const err = new Error('Conta bloqueada. Aguarde a liberação do administrador.');
+      (err as any).status = 403;
+      throw err;
+    }
+
     if (session.expiresAt < new Date()) {
       await prisma.userSession.delete({ where: { id: sessionId } });
       const err = new Error('Refresh Token expirado');
@@ -61,7 +67,7 @@ export class RefreshTokenService {
     });
 
     const accessToken = this.app.jwt.sign(
-      { sub: session.user.id, email: session.user.email },
+      { sub: session.user.id, email: session.user.email, role: session.user.role, status: session.user.status },
       { expiresIn: process.env.JWT_ACCESS_EXPIRES_IN || '15m' }
     );
 

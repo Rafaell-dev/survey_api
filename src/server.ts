@@ -16,6 +16,7 @@ import { questionOptionRoutes } from './modules/question-option/question-option.
 import { mediaRoutes } from './modules/media/media.routes';
 import { conditionalRuleRoutes } from './modules/conditional-rules/conditional-rule.routes';
 import { publicSurveyRoutes } from './modules/public-surveys/public-survey.routes';
+import { usersRoutes } from './modules/users/users.routes';
 import { publicRoutes } from './routes/public';
 
 const app: FastifyInstance = fastify({ logger: true });
@@ -85,6 +86,7 @@ app.register(scaleOptionsRoutes);
 app.register(questionOptionRoutes);
 app.register(mediaRoutes);
 app.register(conditionalRuleRoutes);
+app.register(usersRoutes, { prefix: '/users' });
 
 // Rotas públicas que não requerem autenticação JWT
 app.register(publicSurveyRoutes);

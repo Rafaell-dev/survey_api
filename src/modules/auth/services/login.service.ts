@@ -18,6 +18,12 @@ export class LoginService {
       throw error;
     }
 
+    if (user.status === 'BLOCKED') {
+      const error = new Error('Conta bloqueada. Aguarde a liberação do administrador.');
+      (error as any).status = 403;
+      throw error;
+    }
+
     const isValidPassword = await argon2.verify(user.password, data.password);
 
     if (!isValidPassword) {
@@ -27,7 +33,7 @@ export class LoginService {
     }
 
     const accessToken = this.app.jwt.sign(
-      { sub: user.id, email: user.email },
+      { sub: user.id, email: user.email, role: user.role, status: user.status },
       { expiresIn: process.env.JWT_ACCESS_EXPIRES_IN || '15m' }
     );
 
@@ -55,7 +61,9 @@ export class LoginService {
       user: {
         id: user.id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        role: user.role,
+        status: user.status
       }
     };
   }

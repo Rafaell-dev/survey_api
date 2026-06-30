@@ -2,7 +2,6 @@ import fastify, { FastifyInstance } from 'fastify';
 import jwt from '@fastify/jwt';
 import cors from '@fastify/cors';
 import fastifyMultipart from '@fastify/multipart';
-import fastifyStatic from '@fastify/static';
 import path from 'path';
 import fastifySwagger from '@fastify/swagger';
 import fastifyApiReference from '@scalar/fastify-api-reference';
@@ -32,11 +31,6 @@ app.register(jwt, {
 
 app.register(fastifyMultipart, {
   limits: { fileSize: 200 * 1024 * 1024 } // 200MB limit
-});
-
-app.register(fastifyStatic, {
-  root: path.join(__dirname, '../uploads'),
-  prefix: '/uploads/',
 });
 
 app.register(fastifySwagger, {

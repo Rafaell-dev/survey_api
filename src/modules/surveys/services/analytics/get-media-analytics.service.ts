@@ -25,6 +25,7 @@ export class GetMediaAnalyticsService {
 
       return {
         mediaId: media.id,
+        fileName: media.fileName,
         plays,
         pauses,
         ends,

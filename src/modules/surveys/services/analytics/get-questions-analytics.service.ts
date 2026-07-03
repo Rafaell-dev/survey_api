@@ -63,12 +63,35 @@ export class GetQuestionsAnalyticsService {
 
           questionsStats.push({ ...base, options });
         } else if (q.type === 'LIKERT' || q.type === 'SLIDER') {
-          const values = answers.map(a => a.numericValue).filter(v => v !== null) as number[];
+          const values = answers.map((a: any) => a.numericValue).filter((v: any) => v !== null) as number[];
           if (values.length === 0) continue;
           
-          const sum = values.reduce((a, b) => a + b, 0);
+          const sum = values.reduce((a: number, b: number) => a + b, 0);
+          
+          const counts: Record<number, number> = {};
+          values.forEach(v => {
+            counts[v] = (counts[v] || 0) + 1;
+          });
+
+          const allScaleVals = (q as any).scaleOptions ? (q as any).scaleOptions.map((so: any) => so.numericValue) : [];
+          const distinctValues = Array.from(new Set([...values, ...allScaleVals])).sort((a: any, b: any) => a - b);
+          
+          const options = distinctValues.map((val: any) => {
+            const count = counts[val] || 0;
+            const percentage = values.length > 0 ? (count / values.length) * 100 : 0;
+            const scaleOpt = (q as any).scaleOptions?.find((so: any) => so.numericValue === val);
+            
+            return {
+              optionId: scaleOpt?.id || `val-${val}`,
+              label: scaleOpt?.label || String(val),
+              count,
+              percentage: Number(percentage.toFixed(2))
+            };
+          });
+
           questionsStats.push({
             ...base,
+            options,
             average: Number((sum / values.length).toFixed(2)),
             minimum: Math.min(...values),
             maximum: Math.max(...values),

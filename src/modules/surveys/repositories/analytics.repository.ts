@@ -30,6 +30,7 @@ export class AnalyticsRepository {
               orderBy: { orderIndex: 'asc' },
               include: {
                 options: true,
+                scaleOptions: { orderBy: { numericValue: 'asc' } },
                 answers: {
                   where: {
                     response: {

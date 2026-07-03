@@ -28,6 +28,7 @@ export async function surveysRoutes(app: FastifyInstance) {
   app.get('/:surveyId/analytics/questions', analyticsController.getQuestionsAnalytics.bind(analyticsController));
   app.get('/:surveyId/analytics/navigation', analyticsController.getNavigationAnalytics.bind(analyticsController));
   app.get('/:surveyId/analytics/media', analyticsController.getMediaAnalytics.bind(analyticsController));
+  app.get('/:surveyId/analytics/responses', analyticsController.getResponses.bind(analyticsController));
 
   // Exports
   const exportController = new ExportController();

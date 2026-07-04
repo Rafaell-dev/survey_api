@@ -80,11 +80,24 @@ export class AnalyticsRepository {
         }
       },
       include: {
+        question: {
+          select: { id: true, title: true }
+        },
         interactions: {
           where: {
             response: {
               surveyId
             }
+          },
+          include: {
+            response: {
+              include: {
+                participant: true
+              }
+            }
+          },
+          orderBy: {
+            timestamp: 'asc'
           }
         }
       }

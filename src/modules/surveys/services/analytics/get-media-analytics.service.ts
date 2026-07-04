@@ -23,13 +23,27 @@ export class GetMediaAnalyticsService {
         if (inter.interactionType === 'CLICK') clicks++;
       });
 
+      const interactionsList = media.interactions.map(inter => {
+        const p = inter.response.participant;
+        const participantIdentification = p?.email || p?.phone || p?.name || p?.id || 'Anônimo';
+        return {
+          participantIdentification,
+          interactionType: inter.interactionType,
+          timestamp: inter.timestamp,
+          timeOffsetMs: inter.timeOffsetMs
+        };
+      });
+
       return {
         mediaId: media.id,
         fileName: media.fileName,
+        questionId: media.question?.id || 'unknown',
+        questionTitle: media.question?.title || 'Mídia Genérica',
         plays,
         pauses,
         ends,
-        clicks
+        clicks,
+        interactionsList
       };
     });
 

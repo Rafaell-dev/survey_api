@@ -57,9 +57,10 @@ export class AnalyticsController {
   async getResponses(request: FastifyRequest<{ Params: { surveyId: string }, Querystring: any }>, reply: FastifyReply) {
     try {
       const researcherId = (request.user as any).sub;
-      const filters = typeof request.query.filters === 'string' 
-        ? JSON.parse(request.query.filters) 
-        : request.query;
+      const query = request.query as any;
+      const filters = typeof query.filters === 'string' 
+        ? JSON.parse(query.filters) 
+        : query;
 
       const exportRepo = new ExportRepository();
       const service = new GetResponsesAnalyticsService(exportRepo);

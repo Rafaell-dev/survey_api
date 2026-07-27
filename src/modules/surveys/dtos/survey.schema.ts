@@ -39,6 +39,7 @@ export const syncSurveySchema = z.object({
   deletedBlockIds: z.array(z.string()),
   deletedQuestionIds: z.array(z.string()),
   deletedOptionIds: z.array(z.string()),
+  deletedScaleOptionIds: z.array(z.string()).optional(),
   blocks: z.array(z.object({
     id: z.string(),
     isNew: z.boolean().optional(),
@@ -62,7 +63,16 @@ export const syncSurveySchema = z.object({
         label: z.string(),
         value: z.number().nullable().optional(),
         orderIndex: z.number().int()
-      }))
+      })),
+      scaleOptions: z.array(z.object({
+        id: z.string(),
+        isNew: z.boolean().optional(),
+        label: z.string().nullable().optional(),
+        numericValue: z.number().int(),
+        emoji: z.string().nullable().optional(),
+        icon: z.string().nullable().optional(),
+        orderIndex: z.number().int()
+      })).optional()
     }))
   }))
 });

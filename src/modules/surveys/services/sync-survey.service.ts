@@ -29,6 +29,9 @@ export class SyncSurveyService {
       if (data.deletedBlockIds.length > 0) {
         await tx.block.deleteMany({ where: { id: { in: data.deletedBlockIds } } });
       }
+      if (data.deletedScaleOptionIds && data.deletedScaleOptionIds.length > 0) {
+        await tx.questionScaleOption.deleteMany({ where: { id: { in: data.deletedScaleOptionIds } } });
+      }
 
       // 2. Upserts
       for (const block of data.blocks) {
@@ -112,6 +115,35 @@ export class SyncSurveyService {
               });
             }
           }
+
+          if (question.scaleOptions) {
+            for (const sOpt of question.scaleOptions) {
+              if (sOpt.isNew) {
+                await tx.questionScaleOption.create({
+                  data: {
+                    questionId: actualQuestionId,
+                    label: sOpt.label,
+                    numericValue: sOpt.numericValue,
+                    emoji: sOpt.emoji,
+                    icon: sOpt.icon,
+                    orderIndex: sOpt.orderIndex
+                  }
+                });
+              } else {
+                await tx.questionScaleOption.update({
+                  where: { id: sOpt.id },
+                  data: {
+                    questionId: actualQuestionId,
+                    label: sOpt.label,
+                    numericValue: sOpt.numericValue,
+                    emoji: sOpt.emoji,
+                    icon: sOpt.icon,
+                    orderIndex: sOpt.orderIndex
+                  }
+                });
+              }
+            }
+          }
         }
       }
     });
@@ -126,6 +158,9 @@ export class SyncSurveyService {
           include: {
             options: {
               orderBy: { orderIndex: 'asc' }
+            },
+            scaleOptions: {
+              orderBy: { numericValue: 'asc' }
             }
           }
         }

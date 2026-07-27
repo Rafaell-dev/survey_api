@@ -97,7 +97,7 @@ export class GetQuestionsAnalyticsService {
             maximum: Math.max(...values),
             responses: values.length
           });
-        } else if (q.type === 'SHORT_TEXT' || q.type === 'LONG_TEXT') {
+        } else if (q.type === 'SHORT_TEXT' || q.type === 'LONG_TEXT' || q.type === 'PERCEPTION_TEST') {
           const texts = answers.map(a => a.textValue).filter(v => !!v);
           questionsStats.push({
             ...base,

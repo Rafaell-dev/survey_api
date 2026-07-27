@@ -104,6 +104,19 @@ export class GetResponsesAnalyticsService {
           case 'LONG_TEXT':
             rowData[key] = answer.textValue || '';
             break;
+          case 'PERCEPTION_TEST': {
+            try {
+              const interactions = JSON.parse(answer.textValue || '[]');
+              if (Array.isArray(interactions)) {
+                rowData[key] = interactions.map((i: any) => `[${i.timeOffsetMs ? (i.timeOffsetMs / 1000).toFixed(1) + 's' : '-'}] ${i.answer}`).join('; ');
+              } else {
+                rowData[key] = answer.textValue || '';
+              }
+            } catch {
+              rowData[key] = answer.textValue || '';
+            }
+            break;
+          }
           case 'LIKERT':
           case 'SLIDER':
             rowData[key] = answer.numericValue !== null ? String(answer.numericValue) : '';

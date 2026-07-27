@@ -117,6 +117,19 @@ export class GetResponsesAnalyticsService {
             }
             break;
           }
+          case 'MONITORED_READING': {
+            try {
+              const segments = JSON.parse(answer.textValue || '[]');
+              if (Array.isArray(segments)) {
+                rowData[key] = segments.map((s: any) => `[Trecho ${s.segmentIndex + 1}] ${s.timeSpentMs ? (s.timeSpentMs / 1000).toFixed(1) + 's' : '-'}`).join('; ');
+              } else {
+                rowData[key] = answer.textValue || '';
+              }
+            } catch {
+              rowData[key] = answer.textValue || '';
+            }
+            break;
+          }
           case 'LIKERT':
           case 'SLIDER':
             rowData[key] = answer.numericValue !== null ? String(answer.numericValue) : '';

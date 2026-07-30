@@ -3,14 +3,6 @@ import { PortfolioAdminController } from './controllers/portfolio-admin.controll
 import { PortfolioPublicController } from './controllers/portfolio-public.controller';
 import { jwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-// Guard para verificar se é ADMIN
-async function adminGuard(request: FastifyRequest, reply: FastifyReply) {
-  const user = request.user as any;
-  if (!user || user.role !== 'ADMIN') {
-    return reply.status(403).send({ message: 'Acesso negado. Apenas administradores podem realizar esta ação.' });
-  }
-}
-
 export async function portfolioPublicRoutes(app: FastifyInstance) {
   const publicController = new PortfolioPublicController();
   app.get('/:slug', publicController.getPortfolio.bind(publicController));
@@ -20,7 +12,6 @@ export async function portfolioAdminRoutes(app: FastifyInstance) {
   const adminController = new PortfolioAdminController();
 
   app.addHook('preHandler', jwtAuthGuard);
-  app.addHook('preHandler', adminGuard);
 
   // Profile
   app.get('/profile', adminController.getProfile.bind(adminController));

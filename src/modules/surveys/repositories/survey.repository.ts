@@ -13,6 +13,7 @@ export interface UpdateSurveyInput {
   description?: string;
   instructions?: string;
   status?: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+  isHighlighted?: boolean;
 }
 
 export interface UpdateSurveySettingsInput {

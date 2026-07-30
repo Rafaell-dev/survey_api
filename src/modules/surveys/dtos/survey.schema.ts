@@ -10,10 +10,11 @@ export const createSurveySchema = z.object({
 export const updateSurveySchema = z.object({
   title: z.string().min(3, 'O título deve ter no mínimo 3 caracteres').max(255, 'O título deve ter no máximo 255 caracteres').optional(),
   description: z.string().optional(),
-  instructions: z.string().optional()
-}).refine(data => data.title !== undefined || data.description !== undefined || data.instructions !== undefined, {
+  instructions: z.string().optional(),
+  isHighlighted: z.boolean().optional()
+}).refine(data => data.title !== undefined || data.description !== undefined || data.instructions !== undefined || data.isHighlighted !== undefined, {
   message: 'Pelo menos um campo deve ser enviado para atualização',
-  path: ['title', 'description', 'instructions']
+  path: ['title', 'description', 'instructions', 'isHighlighted']
 });
 
 export const listSurveysSchema = z.object({

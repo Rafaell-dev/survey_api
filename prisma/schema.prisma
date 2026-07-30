@@ -21,16 +21,23 @@ enum UserStatus {
 // ==========================================
 
 model User {
-  id        String        @id @default(uuid())
-  name      String
-  email     String        @unique
-  password  String
-  role      UserRole      @default(USER)
-  status    UserStatus    @default(BLOCKED)
-  surveys   Survey[]
-  sessions  UserSession[]
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  id                      String                  @id @default(uuid())
+  name                    String
+  email                   String                  @unique
+  password                String
+  role                    UserRole                @default(USER)
+  status                  UserStatus              @default(BLOCKED)
+  surveys                 Survey[]
+  sessions                UserSession[]
+  createdAt               DateTime                @default(now())
+  updatedAt               DateTime                @updatedAt
+  portfolioProfile        PortfolioProfile?
+  portfolioInterests      PortfolioInterest[]
+  portfolioEducations     PortfolioEducation[]
+  portfolioEvents         PortfolioEvent[]
+  portfolioPages          PortfolioPage[]
+  portfolioToolCategories PortfolioToolCategory[]
+  portfolioTools          PortfolioTool[]
 }
 
 model UserSession {
@@ -51,8 +58,9 @@ model Survey {
   instructions String?
   status       SurveyStatus @default(DRAFT)
 
-  publicSlug       String?  @unique
-  publicLinkActive Boolean  @default(false)
+  publicSlug       String? @unique
+  publicLinkActive Boolean @default(false)
+  isHighlighted    Boolean @default(false)
 
   participantIdentificationType ParticipantIdentificationType @default(ANONYMOUS)
   allowMultipleResponses        Boolean                       @default(true)
@@ -154,17 +162,17 @@ model QuestionScaleOption {
 
   label String?
   emoji String?
-  icon String?
+  icon  String?
 
   orderIndex Int
 
   questionId String
-  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 
-  @@index([questionId])
   @@unique([questionId, numericValue])
+  @@index([questionId])
 }
 
 model QuestionOption {
@@ -180,14 +188,14 @@ model QuestionOption {
 }
 
 model Media {
-  id         String    @id @default(uuid())
-  type       MediaType
+  id   String    @id @default(uuid())
+  type MediaType
 
-  url        String
-  fileName   String?
+  url      String
+  fileName String?
 
-  mimeType   String?
-  fileSize   Int?
+  mimeType String?
+  fileSize Int?
 
   storageKey String?
 
@@ -229,10 +237,10 @@ enum RuleOperator {
 // ==========================================
 
 model Participant {
-  id         String  @id @default(uuid())
-  name       String?
-  email      String?
-  phone      String?
+  id    String  @id @default(uuid())
+  name  String?
+  email String?
+  phone String?
 
   responses SurveyResponse[]
 
@@ -275,8 +283,8 @@ model Answer {
   questionId String
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
-  selectedOptionId String?
-  selectedOption   QuestionOption? @relation(fields: [selectedOptionId], references: [id])
+  selectedOptionId   String?
+  selectedOption     QuestionOption? @relation(fields: [selectedOptionId], references: [id])
   selectedOptionsIds String[]
 
   createdAt DateTime @default(now())
@@ -321,12 +329,12 @@ enum MediaInteractionType {
 // ==========================================
 
 model Report {
-  id        String   @id @default(uuid())
-  name      String
-  filters   Json
-  
-  surveyId  String
-  survey    Survey   @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  id      String @id @default(uuid())
+  name    String
+  filters Json
+
+  surveyId String
+  survey   Survey @relation(fields: [surveyId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -337,12 +345,12 @@ model Report {
 // ==========================================
 
 model SurveyTheme {
-  id              String  @id @default(uuid())
-  primaryColor    String  @default("#000000")
-  backgroundColor String  @default("#ffffff")
-  textColor       String  @default("#000000")
-  buttonColor     String  @default("#000000")
-  fontFamily      String  @default("Inter")
+  id              String      @id @default(uuid())
+  primaryColor    String      @default("#000000")
+  backgroundColor String      @default("#ffffff")
+  textColor       String      @default("#000000")
+  buttonColor     String      @default("#000000")
+  fontFamily      String      @default("Inter")
   headerImage     String?
   layout          ThemeLayout @default(CARD)
 
@@ -354,4 +362,102 @@ enum ThemeLayout {
   CARD
   FULL_PAGE
   COMPACT
+}
+
+// ==========================================
+// PORTFOLIO / INSTITUTIONAL CMS
+// ==========================================
+
+model PortfolioProfile {
+  id          String  @id @default(uuid())
+  slug        String  @unique
+  name        String
+  avatarUrl   String?
+  aboutPt     String? @db.Text
+  aboutEn     String? @db.Text
+  githubUrl   String?
+  showGithub  Boolean @default(true)
+  lattesUrl   String?
+  showLattes  Boolean @default(true)
+  linkedinUrl String?
+  showLinkedin Boolean @default(true)
+  email       String?
+  showEmail   Boolean @default(true)
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PortfolioInterest {
+  id     String @id @default(uuid())
+  namePt String
+  nameEn String
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PortfolioEducation {
+  id          String @id @default(uuid())
+  degreePt    String
+  degreeEn    String
+  institution String
+  year        Int
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PortfolioEvent {
+  id          String   @id @default(uuid())
+  titlePt     String
+  titleEn     String
+  date        DateTime
+  institution String
+  slidesUrl   String?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PortfolioPage {
+  id        String  @id @default(uuid())
+  slug      String // e.g., 'research', 'teaching', 'group'
+  titlePt   String
+  titleEn   String
+  contentPt String? @db.Text
+  contentEn String? @db.Text
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, slug])
+}
+
+model PortfolioToolCategory {
+  id     String @id @default(uuid())
+  namePt String
+  nameEn String
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tools PortfolioTool[]
+}
+
+model PortfolioTool {
+  id            String  @id @default(uuid())
+  name          String
+  descriptionPt String
+  descriptionEn String
+  url           String?
+  icon          String?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  categories PortfolioToolCategory[]
 }

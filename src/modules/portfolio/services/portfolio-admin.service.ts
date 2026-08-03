@@ -52,7 +52,10 @@ export const portfolioAdminService = {
   // INTERESTS
   // ==========================================
   async listInterests(userId: string) {
-    return prisma.portfolioInterest.findMany({ where: { userId } });
+    return prisma.portfolioInterest.findMany({ 
+      where: { userId },
+      orderBy: { orderIndex: 'asc' }
+    });
   },
 
   async createInterest(userId: string, data: CreateInterestDto) {
@@ -73,7 +76,7 @@ export const portfolioAdminService = {
   async listEducations(userId: string) {
     return prisma.portfolioEducation.findMany({ 
       where: { userId },
-      orderBy: { year: 'desc' }
+      orderBy: [{ orderIndex: 'asc' }, { year: 'desc' }]
     });
   },
 

@@ -29,6 +29,7 @@ export type UpdateProfileDto = z.infer<typeof updateProfileSchema>;
 export const createInterestSchema = z.object({
   namePt: z.string().min(1, 'Nome em PT é obrigatório').max(50, 'Máximo 50 caracteres'),
   nameEn: z.string().min(1, 'Nome em EN é obrigatório').max(50, 'Máximo 50 caracteres'),
+  orderIndex: z.number().int().optional(),
 });
 
 export const updateInterestSchema = createInterestSchema.partial();
@@ -44,6 +45,7 @@ export const createEducationSchema = z.object({
   degreeEn: z.string().min(1, 'Grau em EN é obrigatório').max(100, 'Máximo 100 caracteres'),
   institution: z.string().min(1, 'Instituição é obrigatória').max(100, 'Máximo 100 caracteres'),
   year: z.number().int().min(1900).max(2100),
+  orderIndex: z.number().int().optional(),
 });
 
 export const updateEducationSchema = createEducationSchema.partial();

@@ -394,9 +394,10 @@ model PortfolioProfile {
 }
 
 model PortfolioInterest {
-  id     String @id @default(uuid())
-  namePt String
-  nameEn String
+  id         String @id @default(uuid())
+  namePt     String
+  nameEn     String
+  orderIndex Int    @default(0)
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -408,6 +409,7 @@ model PortfolioEducation {
   degreeEn    String
   institution String
   year        Int
+  orderIndex  Int    @default(0)
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)

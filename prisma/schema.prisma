@@ -372,6 +372,8 @@ model PortfolioProfile {
   id          String  @id @default(uuid())
   slug        String  @unique
   name        String
+  title       String?
+  institution String?
   avatarUrl   String?
   aboutPt     String? @db.Text
   aboutEn     String? @db.Text

@@ -4,18 +4,20 @@ import { z } from 'zod';
 // PROFILE
 // ==========================================
 export const updateProfileSchema = z.object({
-  name: z.string().min(1, 'Nome é obrigatório').optional(),
-  slug: z.string().min(1, 'Slug é obrigatório').regex(/^[a-z0-9-]+$/, 'Slug deve conter apenas letras minúsculas, números e hifens').optional(),
+  name: z.string().min(1, 'Nome é obrigatório').max(100, 'Máximo 100 caracteres').optional(),
+  title: z.string().max(100, 'Máximo 100 caracteres').nullable().optional(),
+  institution: z.string().max(100, 'Máximo 100 caracteres').nullable().optional(),
+  slug: z.string().min(1, 'Slug é obrigatório').max(100).regex(/^[a-z0-9-]+$/, 'Slug deve conter apenas letras minúsculas, números e hifens').optional(),
   avatarUrl: z.string().nullable().optional(),
-  aboutPt: z.string().nullable().optional(),
-  aboutEn: z.string().nullable().optional(),
-  githubUrl: z.string().nullable().optional(),
+  aboutPt: z.string().max(500, 'A biografia pode ter no máximo 500 caracteres.').nullable().optional(),
+  aboutEn: z.string().max(500, 'A biografia pode ter no máximo 500 caracteres.').nullable().optional(),
+  githubUrl: z.string().url('URL inválida').max(200).nullable().optional().or(z.literal("")),
   showGithub: z.boolean().optional(),
-  lattesUrl: z.string().nullable().optional(),
+  lattesUrl: z.string().url('URL inválida').max(200).nullable().optional().or(z.literal("")),
   showLattes: z.boolean().optional(),
-  linkedinUrl: z.string().nullable().optional(),
+  linkedinUrl: z.string().url('URL inválida').max(200).nullable().optional().or(z.literal("")),
   showLinkedin: z.boolean().optional(),
-  email: z.string().email('E-mail inválido').or(z.literal("")).nullable().optional(),
+  email: z.string().email('E-mail inválido').max(100).or(z.literal("")).nullable().optional(),
   showEmail: z.boolean().optional(),
 });
 
@@ -25,8 +27,8 @@ export type UpdateProfileDto = z.infer<typeof updateProfileSchema>;
 // INTERESTS
 // ==========================================
 export const createInterestSchema = z.object({
-  namePt: z.string().min(1, 'Nome em PT é obrigatório'),
-  nameEn: z.string().min(1, 'Nome em EN é obrigatório'),
+  namePt: z.string().min(1, 'Nome em PT é obrigatório').max(50, 'Máximo 50 caracteres'),
+  nameEn: z.string().min(1, 'Nome em EN é obrigatório').max(50, 'Máximo 50 caracteres'),
 });
 
 export const updateInterestSchema = createInterestSchema.partial();
@@ -38,10 +40,10 @@ export type UpdateInterestDto = z.infer<typeof updateInterestSchema>;
 // EDUCATION
 // ==========================================
 export const createEducationSchema = z.object({
-  degreePt: z.string().min(1, 'Grau em PT é obrigatório'),
-  degreeEn: z.string().min(1, 'Grau em EN é obrigatório'),
-  institution: z.string().min(1, 'Instituição é obrigatória'),
-  year: z.number().int(),
+  degreePt: z.string().min(1, 'Grau em PT é obrigatório').max(100, 'Máximo 100 caracteres'),
+  degreeEn: z.string().min(1, 'Grau em EN é obrigatório').max(100, 'Máximo 100 caracteres'),
+  institution: z.string().min(1, 'Instituição é obrigatória').max(100, 'Máximo 100 caracteres'),
+  year: z.number().int().min(1900).max(2100),
 });
 
 export const updateEducationSchema = createEducationSchema.partial();

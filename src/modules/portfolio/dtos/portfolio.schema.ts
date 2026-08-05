@@ -20,6 +20,7 @@ export const updateProfileSchema = z.object({
   email: z.string().email('E-mail inválido').max(100).or(z.literal("")).nullable().optional(),
   showEmail: z.boolean().optional(),
   address: z.string().max(300, 'Máximo 300 caracteres').nullable().optional().or(z.literal("")),
+  themeColor: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, 'Cor inválida').nullable().optional(),
 });
 
 export type UpdateProfileDto = z.infer<typeof updateProfileSchema>;

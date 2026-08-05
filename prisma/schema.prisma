@@ -386,6 +386,7 @@ model PortfolioProfile {
   email       String?
   showEmail   Boolean @default(true)
   address     String? @db.Text
+  themeColor  String? @default("#000000")
 
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)

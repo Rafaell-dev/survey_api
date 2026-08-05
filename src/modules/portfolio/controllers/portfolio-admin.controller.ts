@@ -206,4 +206,18 @@ export class PortfolioAdminController {
     await portfolioAdminService.deleteTool(user.sub, request.params.id);
     return reply.status(204).send();
   }
+
+  // SURVEYS (Integração)
+  async listSurveys(request: FastifyRequest, reply: FastifyReply) {
+    const user = request.user as any;
+    const surveys = await portfolioAdminService.listSurveys(user.sub);
+    return reply.send(surveys);
+  }
+
+  async toggleSurveyHighlight(request: FastifyRequest<{ Params: { id: string }, Body: { isHighlighted: boolean } }>, reply: FastifyReply) {
+    const user = request.user as any;
+    const { isHighlighted } = request.body as { isHighlighted: boolean };
+    const survey = await portfolioAdminService.toggleSurveyHighlight(user.sub, request.params.id, isHighlighted);
+    return reply.send(survey);
+  }
 }

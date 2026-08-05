@@ -385,6 +385,7 @@ model PortfolioProfile {
   showLinkedin Boolean @default(true)
   email       String?
   showEmail   Boolean @default(true)
+  address     String? @db.Text
 
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)

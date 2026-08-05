@@ -19,6 +19,7 @@ export const updateProfileSchema = z.object({
   showLinkedin: z.boolean().optional(),
   email: z.string().email('E-mail inválido').max(100).or(z.literal("")).nullable().optional(),
   showEmail: z.boolean().optional(),
+  address: z.string().max(300, 'Máximo 300 caracteres').nullable().optional().or(z.literal("")),
 });
 
 export type UpdateProfileDto = z.infer<typeof updateProfileSchema>;

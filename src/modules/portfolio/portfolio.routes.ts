@@ -54,4 +54,8 @@ export async function portfolioAdminRoutes(app: FastifyInstance) {
   app.post('/tools', adminController.createTool.bind(adminController));
   app.put('/tools/:id', adminController.updateTool.bind(adminController));
   app.delete('/tools/:id', adminController.deleteTool.bind(adminController));
+
+  // Surveys (Integração)
+  app.get('/surveys', adminController.listSurveys.bind(adminController));
+  app.patch('/surveys/:id/highlight', adminController.toggleSurveyHighlight.bind(adminController));
 }

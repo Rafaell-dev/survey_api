@@ -192,5 +192,42 @@ export const portfolioAdminService = {
 
   async deleteTool(userId: string, id: string) {
     return prisma.portfolioTool.delete({ where: { id, userId } });
+  },
+
+  // ==========================================
+  // SURVEYS (Integração)
+  // ==========================================
+  async listSurveys(userId: string) {
+    return prisma.survey.findMany({
+      where: { researcherId: userId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        status: true,
+        isHighlighted: true,
+        publicSlug: true,
+      }
+    });
+  },
+
+  async toggleSurveyHighlight(userId: string, surveyId: string, isHighlighted: boolean) {
+    const survey = await prisma.survey.findUnique({
+      where: { id: surveyId }
+    });
+
+    if (!survey || survey.researcherId !== userId) {
+      throw new AppError('Pesquisa não encontrada', 404);
+    }
+
+    return prisma.survey.update({
+      where: { id: surveyId },
+      data: { isHighlighted },
+      select: {
+        id: true,
+        isHighlighted: true,
+      }
+    });
   }
 };

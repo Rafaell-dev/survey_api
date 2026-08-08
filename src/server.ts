@@ -1,4 +1,4 @@
-import fastify, { FastifyInstance } from 'fastify';
+import fastify, { FastifyInstance } from 'fastify'; 
 import jwt from '@fastify/jwt';
 import cors from '@fastify/cors';
 import fastifyMultipart from '@fastify/multipart';

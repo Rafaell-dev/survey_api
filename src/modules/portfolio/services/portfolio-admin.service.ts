@@ -211,6 +211,13 @@ export const portfolioAdminService = {
         status: true,
         isHighlighted: true,
         publicSlug: true,
+        categoryId: true,
+        category: {
+          select: {
+            id: true,
+            name: true,
+          }
+        }
       }
     });
   },

@@ -17,6 +17,7 @@ import { conditionalRuleRoutes } from './modules/conditional-rules/conditional-r
 import { publicSurveyRoutes } from './modules/public-surveys/public-survey.routes';
 import { usersRoutes } from './modules/users/users.routes';
 import { portfolioAdminRoutes, portfolioPublicRoutes } from './modules/portfolio/portfolio.routes';
+import { surveyCategoryRoutes } from './modules/survey-categories/survey-category.routes';
 import { publicRoutes } from './routes/public';
 
 const app: FastifyInstance = fastify({ logger: true });
@@ -84,6 +85,7 @@ app.register(conditionalRuleRoutes);
 app.register(usersRoutes, { prefix: '/users' });
 app.register(portfolioAdminRoutes, { prefix: '/portfolio/admin' });
 app.register(portfolioPublicRoutes, { prefix: '/portfolio/public' });
+app.register(surveyCategoryRoutes, { prefix: '/survey-categories' });
 
 // Rotas públicas que não requerem autenticação JWT
 app.register(publicSurveyRoutes);

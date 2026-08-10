@@ -14,6 +14,7 @@ export interface UpdateSurveyInput {
   instructions?: string;
   status?: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
   isHighlighted?: boolean;
+  categoryId?: string | null;
 }
 
 export interface UpdateSurveySettingsInput {
@@ -53,7 +54,10 @@ export class PrismaSurveyRepository implements SurveyRepository {
 
   async findById(id: string): Promise<Survey | null> {
     return prisma.survey.findUnique({
-      where: { id }
+      where: { id },
+      include: {
+        category: true,
+      }
     });
   }
 

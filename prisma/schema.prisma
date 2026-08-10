@@ -38,6 +38,7 @@ model User {
   portfolioPages          PortfolioPage[]
   portfolioToolCategories PortfolioToolCategory[]
   portfolioTools          PortfolioTool[]
+  surveyCategories        SurveyCategory[]
 }
 
 model UserSession {
@@ -68,6 +69,9 @@ model Survey {
   researcherId String
   researcher   User   @relation(fields: [researcherId], references: [id])
 
+  categoryId   String?
+  category     SurveyCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
   blocks    Block[]
   responses SurveyResponse[]
   reports   Report[]
@@ -81,6 +85,19 @@ enum SurveyStatus {
   DRAFT
   PUBLISHED
   ARCHIVED
+}
+
+model SurveyCategory {
+  id        String   @id @default(uuid())
+  name      String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  surveys   Survey[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, name])
 }
 
 enum ParticipantIdentificationType {

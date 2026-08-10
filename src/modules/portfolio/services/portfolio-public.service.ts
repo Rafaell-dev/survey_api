@@ -13,7 +13,7 @@ export const portfolioPublicService = {
 
     const userId = profile.userId;
 
-    const [interests, educations, events, pages, categories, tools, surveys] = await Promise.all([
+    const [interests, educations, events, pages, categories, tools, surveys, surveyCategories] = await Promise.all([
       prisma.portfolioInterest.findMany({ where: { userId } }),
       prisma.portfolioEducation.findMany({ where: { userId }, orderBy: { year: 'desc' } }),
       prisma.portfolioEvent.findMany({ where: { userId }, orderBy: { date: 'desc' } }),
@@ -22,8 +22,16 @@ export const portfolioPublicService = {
       prisma.portfolioTool.findMany({ where: { userId }, include: { categories: true } }),
       prisma.survey.findMany({ 
         where: { researcherId: userId, isHighlighted: true, status: 'PUBLISHED' },
-        select: { id: true, title: true, description: true, publicSlug: true }
+        select: { 
+          id: true, 
+          title: true, 
+          description: true, 
+          publicSlug: true,
+          categoryId: true,
+          category: { select: { id: true, name: true } }
+        }
       }),
+      prisma.surveyCategory.findMany({ where: { userId }, orderBy: { name: 'asc' } }),
     ]);
 
     return {
@@ -34,7 +42,8 @@ export const portfolioPublicService = {
       pages,
       categories,
       tools,
-      surveys
+      surveys,
+      surveyCategories
     };
   }
 };

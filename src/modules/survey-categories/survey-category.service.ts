@@ -18,6 +18,11 @@ export const surveyCategoryService = {
   },
 
   async createCategory(userId: string, data: CreateSurveyCategoryDTO) {
+    const count = await prisma.surveyCategory.count({ where: { userId } });
+    if (count >= 5) {
+      throw new AppError('Você atingiu o limite máximo de 5 categorias cadastradas.', 400);
+    }
+
     const nameTrimmed = data.name.trim();
 
     const existing = await prisma.surveyCategory.findFirst({

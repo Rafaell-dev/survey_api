@@ -199,7 +199,10 @@ export const portfolioAdminService = {
   // ==========================================
   async listSurveys(userId: string) {
     return prisma.survey.findMany({
-      where: { researcherId: userId },
+      where: { 
+        researcherId: userId,
+        status: { not: 'ARCHIVED' }
+      },
       orderBy: { createdAt: 'desc' },
       select: {
         id: true,

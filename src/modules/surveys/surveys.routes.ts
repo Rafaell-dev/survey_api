@@ -17,6 +17,7 @@ export async function surveysRoutes(app: FastifyInstance) {
   app.get('/', surveysController.list.bind(surveysController));
   app.get('/metrics', surveysController.getMetrics.bind(surveysController));
   app.get('/:surveyId', surveysController.get.bind(surveysController));
+  app.get('/:surveyId/preview', surveysController.preview.bind(surveysController));
   app.patch('/:surveyId', surveysController.update.bind(surveysController));
   app.patch('/:surveyId/settings', surveysController.updateSettings.bind(surveysController));
   app.put('/:surveyId/sync', surveysController.sync.bind(surveysController));

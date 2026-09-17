@@ -8,6 +8,8 @@ import { ArchiveSurveyService } from '../services/archive-survey.service';
 import { UpdateSurveySettingsService } from '../services/update-survey-settings.service';
 import { SyncSurveyService } from '../services/sync-survey.service';
 import { GetGlobalMetricsService } from '../services/get-global-metrics.service';
+import { PreviewSurveyService } from '../services/preview-survey.service';
+import { PublicSurveyRepository } from '../../public-surveys/repositories/public-survey.repository';
 import { createSurveySchema, listSurveysSchema, updateSurveySchema, updateSurveySettingsSchema, syncSurveySchema } from '../dtos/survey.schema';
 
 export class SurveysController {
@@ -120,6 +122,17 @@ export class SurveysController {
       const service = new GetGlobalMetricsService(this.repository);
       const researcherId = (request.user as any).sub;
       const result = await service.execute(researcherId);
+      return reply.status(200).send(result);
+    } catch (err: any) {
+      return reply.status(err.status || 500).send({ message: err.message });
+    }
+  }
+
+  async preview(request: FastifyRequest<{ Params: { surveyId: string } }>, reply: FastifyReply) {
+    try {
+      const service = new PreviewSurveyService(new PublicSurveyRepository());
+      const researcherId = (request.user as any).sub;
+      const result = await service.execute(request.params.surveyId, researcherId);
       return reply.status(200).send(result);
     } catch (err: any) {
       return reply.status(err.status || 500).send({ message: err.message });

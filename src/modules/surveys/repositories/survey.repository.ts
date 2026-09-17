@@ -27,6 +27,7 @@ export interface ListSurveysFilters {
   page: number;
   limit: number;
   search?: string;
+  includeArchived?: boolean;
 }
 
 export interface SurveyRepository {
@@ -62,12 +63,12 @@ export class PrismaSurveyRepository implements SurveyRepository {
   }
 
   async findMany(filters: ListSurveysFilters): Promise<Survey[]> {
-    const { researcherId, page, limit, search } = filters;
+    const { researcherId, page, limit, search, includeArchived } = filters;
     
     return prisma.survey.findMany({
       where: {
         researcherId,
-        status: { not: 'ARCHIVED' },
+        ...(includeArchived ? {} : { status: { not: 'ARCHIVED' } }),
         ...(search ? { title: { contains: search, mode: 'insensitive' } } : {})
       },
       orderBy: { createdAt: 'desc' },
@@ -77,12 +78,12 @@ export class PrismaSurveyRepository implements SurveyRepository {
   }
 
   async count(filters: ListSurveysFilters): Promise<number> {
-    const { researcherId, search } = filters;
+    const { researcherId, search, includeArchived } = filters;
 
     return prisma.survey.count({
       where: {
         researcherId,
-        status: { not: 'ARCHIVED' },
+        ...(includeArchived ? {} : { status: { not: 'ARCHIVED' } }),
         ...(search ? { title: { contains: search, mode: 'insensitive' } } : {})
       }
     });

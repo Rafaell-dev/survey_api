@@ -21,7 +21,8 @@ export const updateSurveySchema = z.object({
 export const listSurveysSchema = z.object({
   page: z.string().regex(/^\d+$/).transform(Number).optional().default(1),
   limit: z.string().regex(/^\d+$/).transform(Number).optional().default(20),
-  search: z.string().optional()
+  search: z.string().optional(),
+  includeArchived: z.string().optional().transform(val => val === 'true')
 });
 
 export type CreateSurveyDto = z.infer<typeof createSurveySchema>;

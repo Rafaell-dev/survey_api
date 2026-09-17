@@ -12,7 +12,8 @@ export class ListSurveysService {
       researcherId,
       page,
       limit,
-      search: filters.search
+      search: filters.search,
+      includeArchived: filters.includeArchived
     };
 
     const [items, total] = await Promise.all([

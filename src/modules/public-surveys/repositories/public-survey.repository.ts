@@ -201,4 +201,11 @@ export class PublicSurveyRepository {
 
     return created.count;
   }
+
+  async interruptResponse(responseId: string) {
+    return prisma.surveyResponse.update({
+      where: { id: responseId },
+      data: { isInterrupted: true }
+    });
+  }
 }

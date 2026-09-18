@@ -9,6 +9,7 @@ import { GetNextBlockService } from '../services/get-next-block.service';
 import { FinishResponseService } from '../services/finish-response.service';
 import { SaveTrackingService } from '../services/save-tracking.service';
 import { SaveMediaInteractionsService } from '../services/save-media-interactions.service';
+import { InterruptResponseService } from '../services/interrupt-response.service';
 import { saveAnswerSchema, saveTrackingSchema, saveMediaInteractionsSchema } from '../dtos/response.schema';
 
 export class PublicSurveyController {
@@ -119,6 +120,16 @@ export class PublicSurveyController {
       const service = new SaveMediaInteractionsService(this.repository);
       const result = await service.execute(request.params.responseId, parseResult.data);
       return reply.status(201).send(result);
+    } catch (err: any) {
+      return reply.status(err.status || 500).send({ message: err.message });
+    }
+  }
+
+  async interruptResponse(request: FastifyRequest<{ Params: { responseId: string } }>, reply: FastifyReply) {
+    try {
+      const service = new InterruptResponseService(this.repository);
+      const result = await service.execute(request.params.responseId);
+      return reply.status(200).send(result);
     } catch (err: any) {
       return reply.status(err.status || 500).send({ message: err.message });
     }

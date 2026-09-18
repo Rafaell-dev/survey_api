@@ -111,6 +111,20 @@ export async function publicRoutes(app: FastifyInstance) {
     return updated;
   });
 
+  // 4.5. Interromper o survey (Ex: saída de aba)
+  app.post('/response/:responseId/interrupt', async (request: FastifyRequest<{ Params: { responseId: string } }>, reply) => {
+    const { responseId } = request.params;
+
+    const updated = await prisma.surveyResponse.update({
+      where: { id: responseId },
+      data: {
+        isInterrupted: true
+      }
+    });
+
+    return reply.status(200).send(updated);
+  });
+
   // 5. Salvar tracking de tempo no bloco
   app.post('/response/:responseId/track/block', async (request: FastifyRequest<{ Params: { responseId: string }, Body: { blockId: string; enteredAt: string; leftAt: string; timeSpentMs: number; orderIndex: number } }>, reply) => {
     const { responseId } = request.params;

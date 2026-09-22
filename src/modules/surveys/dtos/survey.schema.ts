@@ -30,8 +30,9 @@ export type UpdateSurveyDto = z.infer<typeof updateSurveySchema>;
 
 export const updateSurveySettingsSchema = z.object({
   participantIdentificationType: z.nativeEnum(ParticipantIdentificationType).optional(),
-  allowMultipleResponses: z.boolean().optional()
-}).refine(data => data.participantIdentificationType !== undefined || data.allowMultipleResponses !== undefined, {
+  allowMultipleResponses: z.boolean().optional(),
+  acceptingResponses: z.boolean().optional()
+}).refine(data => data.participantIdentificationType !== undefined || data.allowMultipleResponses !== undefined || data.acceptingResponses !== undefined, {
   message: 'Pelo menos um campo deve ser enviado para atualização'
 });
 

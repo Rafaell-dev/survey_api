@@ -20,6 +20,7 @@ export interface UpdateSurveyInput {
 export interface UpdateSurveySettingsInput {
   participantIdentificationType?: 'ANONYMOUS' | 'EMAIL' | 'PHONE' | 'EMAIL_OR_PHONE' | 'NAME_AND_EMAIL';
   allowMultipleResponses?: boolean;
+  acceptingResponses?: boolean;
 }
 
 export interface ListSurveysFilters {

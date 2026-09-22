@@ -65,6 +65,7 @@ model Survey {
 
   participantIdentificationType ParticipantIdentificationType @default(ANONYMOUS)
   allowMultipleResponses        Boolean                       @default(true)
+  acceptingResponses            Boolean                       @default(true)
 
   researcherId String
   researcher   User   @relation(fields: [researcherId], references: [id])

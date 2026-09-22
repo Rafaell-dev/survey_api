@@ -17,6 +17,12 @@ export class SyncSurveyService {
       throw err;
     }
 
+    if (survey.status === 'PUBLISHED' && survey.acceptingResponses === true) {
+      const err = new Error('Não é possível editar a estrutura de um formulário publicado que está aceitando respostas. Pause o recebimento de respostas nas configurações primeiro.');
+      (err as any).status = 409;
+      throw err;
+    }
+
     // Transação de sincronização da árvore
     await prisma.$transaction(async (tx) => {
       // 1. Deleções (bottom-up é seguro, mas onDelete cascade tb resolve. Fazemos explícito por clareza)

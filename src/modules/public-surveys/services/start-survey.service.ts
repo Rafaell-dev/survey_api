@@ -18,6 +18,12 @@ export class StartSurveyService {
       throw err;
     }
 
+    if (survey.acceptingResponses === false) {
+      const err = new Error('Este formulário não está aceitando novas respostas no momento');
+      (err as any).status = 403;
+      throw err;
+    }
+
     const { participantIdentificationType, allowMultipleResponses } = survey;
 
     switch(participantIdentificationType) {

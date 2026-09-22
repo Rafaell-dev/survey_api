@@ -22,8 +22,14 @@ import { publicRoutes } from './routes/public';
 
 const app: FastifyInstance = fastify({ logger: true });
 
+const getCorsOrigin = () => {
+  const origin = process.env.CORS_ORIGIN;
+  if (!origin || origin === '*') return '*';
+  return origin.includes(',') ? origin.split(',').map(o => o.trim()) : origin;
+};
+
 app.register(cors, { 
-  origin: process.env.CORS_ORIGIN || '*',
+  origin: getCorsOrigin(),
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
 });
 

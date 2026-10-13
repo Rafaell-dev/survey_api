@@ -6,6 +6,7 @@ export const saveAnswerSchema = z.object({
   numericValue: z.number().optional(),
   selectedOptionId: z.string().uuid('ID de opção inválido').optional(),
   selectedOptionsIds: z.array(z.string().uuid('ID de opção inválido')).optional(),
+  mediaId: z.string().uuid('ID da mídia inválido').optional(),
   timeSpentMs: z.number().min(0, 'Tempo não pode ser negativo')
 });
 

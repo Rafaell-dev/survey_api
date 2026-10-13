@@ -43,6 +43,13 @@ export class UploadMediaService {
       throw err;
     }
 
+    const currentMedias = await this.repository.findByQuestionId(questionId);
+    if (currentMedias.length >= 4) {
+      const err = new Error('Limite máximo de 4 mídias por questão atingido.');
+      (err as any).status = 400;
+      throw err;
+    }
+
     const validation = validateMediaFile(mimeType, fileSize);
     if (!validation.valid) {
       const err = new Error(validation.error);
@@ -72,7 +79,8 @@ export class UploadMediaService {
       fileName,
       mimeType,
       fileSize,
-      storageKey: key
+      storageKey: key,
+      orderIndex: currentMedias.length
     });
   }
 }

@@ -9,7 +9,9 @@ export async function mediaRoutes(app: FastifyInstance) {
 
   app.post('/questions/:questionId/media', controller.upload.bind(controller));
   app.get('/questions/:questionId/media', controller.list.bind(controller));
+  app.patch('/questions/:questionId/media/reorder', controller.reorder.bind(controller));
   
   app.get('/media/:mediaId', controller.get.bind(controller));
+  app.patch('/media/:mediaId', controller.update.bind(controller));
   app.delete('/media/:mediaId', controller.delete.bind(controller));
 }

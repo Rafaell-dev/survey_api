@@ -21,10 +21,38 @@ export class PrismaMediaRepository {
   }
 
   async findByQuestionId(questionId: string) {
-    return prisma.media.findMany({
+    const medias = await prisma.media.findMany({
       where: { questionId },
-      orderBy: { createdAt: 'desc' }
+      include: {
+        _count: {
+          select: { answers: true }
+        }
+      },
+      orderBy: [{ orderIndex: 'asc' }, { createdAt: 'asc' }]
     });
+
+    return medias.map(m => ({
+      ...m,
+      answersCount: m._count.answers
+    }));
+  }
+
+  async update(id: string, data: { orderIndex?: number; responseLimit?: number | null }) {
+    return prisma.media.update({
+      where: { id },
+      data
+    });
+  }
+
+  async reorder(questionId: string, mediaIds: string[]) {
+    return prisma.$transaction(
+      mediaIds.map((id, index) =>
+        prisma.media.update({
+          where: { id, questionId },
+          data: { orderIndex: index }
+        })
+      )
+    );
   }
 
   async delete(id: string) {
@@ -33,3 +61,4 @@ export class PrismaMediaRepository {
     });
   }
 }
+

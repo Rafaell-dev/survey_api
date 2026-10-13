@@ -220,7 +220,11 @@ model Media {
   questionId String?
   question   Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
+  orderIndex    Int      @default(0)
+  responseLimit Int?     // Limite de 1 a 9999 respostas
+
   interactions MediaInteraction[]
+  answers      Answer[]
 
   createdAt DateTime @default(now())
 }
@@ -305,6 +309,9 @@ model Answer {
   selectedOptionId   String?
   selectedOption     QuestionOption? @relation(fields: [selectedOptionId], references: [id])
   selectedOptionsIds String[]
+
+  mediaId String?
+  media   Media?  @relation(fields: [mediaId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
 }

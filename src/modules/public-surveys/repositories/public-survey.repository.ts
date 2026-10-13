@@ -6,12 +6,43 @@ export interface SaveAnswerData {
   numericValue?: number;
   selectedOptionId?: string;
   selectedOptionsIds?: string[];
+  mediaId?: string;
   timeSpentMs: number;
 }
 
 export class PublicSurveyRepository {
+  private filterActiveMedias(survey: any) {
+    if (!survey || !survey.blocks) return survey;
+    for (const block of survey.blocks) {
+      if (!block.questions) continue;
+      for (const question of block.questions) {
+        if (!question.medias || question.medias.length === 0) continue;
+
+        const hasConditionalLimit = question.medias.some(
+          (m: any) => m.responseLimit !== null && m.responseLimit !== undefined
+        );
+
+        if (hasConditionalLimit) {
+          const activeMedia = question.medias.find((m: any) => {
+            const count = m._count?.answers ?? 0;
+            if (m.responseLimit !== null && m.responseLimit !== undefined) {
+              return count < m.responseLimit;
+            }
+            return true;
+          }) || question.medias[question.medias.length - 1];
+
+          const { _count, ...rest } = activeMedia;
+          question.medias = [rest];
+        } else {
+          question.medias = question.medias.map(({ _count, ...rest }: any) => rest);
+        }
+      }
+    }
+    return survey;
+  }
+
   async findBySlug(slug: string) {
-    return prisma.survey.findUnique({
+    const survey = await prisma.survey.findUnique({
       where: { publicSlug: slug },
       include: {
         theme: true,
@@ -24,17 +55,26 @@ export class PublicSurveyRepository {
                 options: { orderBy: { orderIndex: 'asc' } },
                 scaleOptions: { orderBy: { orderIndex: 'asc' } },
                 rules: true,
-                medias: true,
+                medias: {
+                  orderBy: [{ orderIndex: 'asc' }, { createdAt: 'asc' }],
+                  include: {
+                    _count: {
+                      select: { answers: true }
+                    }
+                  }
+                },
               }
             }
           }
         }
       }
     });
+
+    return this.filterActiveMedias(survey);
   }
 
   async findPublishedSurveyById(id: string) {
-    return prisma.survey.findUnique({
+    const survey = await prisma.survey.findUnique({
       where: { id },
       include: {
         theme: true,
@@ -47,13 +87,22 @@ export class PublicSurveyRepository {
                 options: { orderBy: { orderIndex: 'asc' } },
                 scaleOptions: { orderBy: { orderIndex: 'asc' } },
                 rules: true,
-                medias: true,
+                medias: {
+                  orderBy: [{ orderIndex: 'asc' }, { createdAt: 'asc' }],
+                  include: {
+                    _count: {
+                      select: { answers: true }
+                    }
+                  }
+                },
               }
             }
           }
         }
       }
     });
+
+    return this.filterActiveMedias(survey);
   }
 
   async createParticipant(data: { name?: string, email?: string, phone?: string }) {
@@ -125,6 +174,31 @@ export class PublicSurveyRepository {
   }
 
   async saveAnswer(responseId: string, questionId: string, data: SaveAnswerData) {
+    let mediaIdToSave = data.mediaId;
+    if (!mediaIdToSave) {
+      const questionMedias = await prisma.media.findMany({
+        where: { questionId },
+        include: { _count: { select: { answers: true } } },
+        orderBy: [{ orderIndex: 'asc' }, { createdAt: 'asc' }]
+      });
+      if (questionMedias.length > 0) {
+        const hasConditionalLimit = questionMedias.some(
+          m => m.responseLimit !== null && m.responseLimit !== undefined
+        );
+        if (hasConditionalLimit) {
+          const active = questionMedias.find(m => {
+            if (m.responseLimit !== null && m.responseLimit !== undefined) {
+              return m._count.answers < m.responseLimit;
+            }
+            return true;
+          }) || questionMedias[questionMedias.length - 1];
+          mediaIdToSave = active.id;
+        } else if (questionMedias.length === 1) {
+          mediaIdToSave = questionMedias[0].id;
+        }
+      }
+    }
+
     const existing = await prisma.answer.findFirst({
       where: { responseId, questionId }
     });
@@ -137,6 +211,7 @@ export class PublicSurveyRepository {
           numericValue: data.numericValue ?? null,
           selectedOptionId: data.selectedOptionId ?? null,
           selectedOptionsIds: data.selectedOptionsIds ?? [],
+          mediaId: mediaIdToSave ?? existing.mediaId,
           timeSpentMs: data.timeSpentMs
         }
       });
@@ -150,6 +225,7 @@ export class PublicSurveyRepository {
         numericValue: data.numericValue,
         selectedOptionId: data.selectedOptionId,
         selectedOptionsIds: data.selectedOptionsIds ?? [],
+        mediaId: mediaIdToSave,
         timeSpentMs: data.timeSpentMs
       }
     });

@@ -6,6 +6,9 @@ import { ListMediaService } from '../services/list-media.service';
 import { GetMediaService } from '../services/get-media.service';
 import { DeleteMediaService } from '../services/delete-media.service';
 
+import { UpdateMediaService } from '../services/update-media.service';
+import { ReorderMediaService } from '../services/reorder-media.service';
+
 export class MediaController {
   private repository = new PrismaMediaRepository();
   private storageProvider = new CloudflareR2StorageProvider();
@@ -52,6 +55,28 @@ export class MediaController {
       const service = new GetMediaService(this.repository);
       const researcherId = (request.user as any).sub;
       const result = await service.execute(request.params.mediaId, researcherId);
+      return reply.status(200).send(result);
+    } catch (err: any) {
+      return reply.status(err.status || 500).send({ message: err.message });
+    }
+  }
+
+  async update(request: FastifyRequest<{ Params: { mediaId: string }; Body: { responseLimit?: number | null; orderIndex?: number } }>, reply: FastifyReply) {
+    try {
+      const service = new UpdateMediaService(this.repository);
+      const researcherId = (request.user as any).sub;
+      const result = await service.execute(request.params.mediaId, researcherId, request.body);
+      return reply.status(200).send(result);
+    } catch (err: any) {
+      return reply.status(err.status || 500).send({ message: err.message });
+    }
+  }
+
+  async reorder(request: FastifyRequest<{ Params: { questionId: string }; Body: { mediaIds: string[] } }>, reply: FastifyReply) {
+    try {
+      const service = new ReorderMediaService(this.repository);
+      const researcherId = (request.user as any).sub;
+      const result = await service.execute(request.params.questionId, researcherId, request.body.mediaIds);
       return reply.status(200).send(result);
     } catch (err: any) {
       return reply.status(err.status || 500).send({ message: err.message });

@@ -40,6 +40,8 @@ export class SyncSurveyService {
       }
 
       // 2. Upserts
+      const blockIdMap = new Map<string, string>();
+
       for (const block of data.blocks) {
         let actualBlockId = block.id;
 
@@ -49,19 +51,25 @@ export class SyncSurveyService {
               surveyId,
               title: block.title,
               description: block.description,
-              orderIndex: block.orderIndex
+              orderIndex: block.orderIndex,
+              responseLimit: block.responseLimit ?? null,
+              showOnlyOnFallback: block.showOnlyOnFallback ?? false
             }
           });
           actualBlockId = created.id;
+          blockIdMap.set(block.id, created.id);
         } else {
           await tx.block.update({
             where: { id: block.id },
             data: {
               title: block.title,
               description: block.description,
-              orderIndex: block.orderIndex
+              orderIndex: block.orderIndex,
+              responseLimit: block.responseLimit ?? null,
+              showOnlyOnFallback: block.showOnlyOnFallback ?? false
             }
           });
+          blockIdMap.set(block.id, block.id);
         }
 
         for (const question of block.questions) {
@@ -152,6 +160,21 @@ export class SyncSurveyService {
           }
         }
       }
+
+      // Atualiza fallbackBlockId para todos os blocos (garantindo que referências cruzadas ou a novos blocos funcionem)
+      for (const block of data.blocks) {
+        const actualBlockId = blockIdMap.get(block.id) || block.id;
+        const targetFallbackId = block.fallbackBlockId
+          ? (blockIdMap.get(block.fallbackBlockId) || block.fallbackBlockId)
+          : null;
+
+        if (block.fallbackBlockId !== undefined) {
+          await tx.block.update({
+            where: { id: actualBlockId },
+            data: { fallbackBlockId: targetFallbackId }
+          });
+        }
+      }
     });
 
     // Retorna a árvore atualizada, ordenadinha
@@ -159,6 +182,9 @@ export class SyncSurveyService {
       where: { surveyId },
       orderBy: { orderIndex: 'asc' },
       include: {
+        fallbackBlock: {
+          select: { id: true, title: true, orderIndex: true }
+        },
         questions: {
           orderBy: { orderIndex: 'asc' },
           include: {
@@ -173,6 +199,24 @@ export class SyncSurveyService {
       }
     });
 
-    return tree;
+    const enrichedTree = await Promise.all(
+      tree.map(async (block) => {
+        const count = await prisma.surveyResponse.count({
+          where: {
+            surveyId,
+            OR: [
+              { answers: { some: { question: { blockId: block.id } } } },
+              { blockTrackings: { some: { blockId: block.id } } }
+            ]
+          }
+        });
+        return {
+          ...block,
+          responsesCount: count
+        };
+      })
+    );
+
+    return enrichedTree;
   }
 }

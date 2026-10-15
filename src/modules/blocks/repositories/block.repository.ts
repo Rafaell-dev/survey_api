@@ -6,12 +6,18 @@ export interface CreateBlockInput {
   description?: string;
   orderIndex: number;
   surveyId: string;
+  responseLimit?: number | null;
+  fallbackBlockId?: string | null;
+  showOnlyOnFallback?: boolean;
 }
 
 export interface UpdateBlockInput {
   title?: string;
   description?: string;
   orderIndex?: number;
+  responseLimit?: number | null;
+  fallbackBlockId?: string | null;
+  showOnlyOnFallback?: boolean;
 }
 
 export class PrismaBlockRepository {
@@ -23,6 +29,7 @@ export class PrismaBlockRepository {
     return prisma.block.findUnique({
       where: { id },
       include: {
+        fallbackBlock: { select: { id: true, title: true, orderIndex: true } },
         rulesTargeted: { select: { id: true } },
         survey: {
           include: {
@@ -34,15 +41,33 @@ export class PrismaBlockRepository {
   }
 
   async findManyBySurveyId(surveyId: string) {
-    return prisma.block.findMany({
+    const blocks = await prisma.block.findMany({
       where: { surveyId },
       orderBy: { orderIndex: 'asc' },
-      select: {
-        id: true,
-        title: true,
-        orderIndex: true
+      include: {
+        fallbackBlock: { select: { id: true, title: true, orderIndex: true } }
       }
     });
+
+    const enriched = await Promise.all(
+      blocks.map(async (block) => {
+        const count = await prisma.surveyResponse.count({
+          where: {
+            surveyId,
+            OR: [
+              { answers: { some: { question: { blockId: block.id } } } },
+              { blockTrackings: { some: { blockId: block.id } } }
+            ]
+          }
+        });
+        return {
+          ...block,
+          responsesCount: count
+        };
+      })
+    );
+
+    return enriched;
   }
 
   async findLastBlockBySurveyId(surveyId: string) {

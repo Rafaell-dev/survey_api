@@ -115,6 +115,12 @@ model Block {
   description String?
   orderIndex  Int
 
+  responseLimit      Int?
+  fallbackBlockId    String?
+  fallbackBlock      Block?   @relation("BlockFallback", fields: [fallbackBlockId], references: [id], onDelete: SetNull)
+  fallbackSources    Block[]  @relation("BlockFallback")
+  showOnlyOnFallback Boolean  @default(false)
+
   surveyId String
   survey   Survey @relation(fields: [surveyId], references: [id], onDelete: Cascade)
 

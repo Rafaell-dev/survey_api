@@ -17,27 +17,47 @@ export class PublicSurveyRepository {
       if (!block.questions) continue;
       for (const question of block.questions) {
         if (!question.medias || question.medias.length === 0) continue;
-
-        const hasConditionalLimit = question.medias.some(
-          (m: any) => m.responseLimit !== null && m.responseLimit !== undefined
-        );
-
-        if (hasConditionalLimit) {
-          const activeMedia = question.medias.find((m: any) => {
-            const count = m._count?.answers ?? 0;
-            if (m.responseLimit !== null && m.responseLimit !== undefined) {
-              return count < m.responseLimit;
-            }
-            return true;
-          }) || question.medias[question.medias.length - 1];
-
-          const { _count, ...rest } = activeMedia;
-          question.medias = [rest];
-        } else {
-          question.medias = question.medias.map(({ _count, ...rest }: any) => rest);
-        }
+        question.medias = question.medias.map(({ _count, ...rest }: any) => rest);
       }
     }
+    return survey;
+  }
+
+  private async processSurveyForPublic(survey: any) {
+    if (!survey || !survey.blocks) return survey;
+
+    // 1. Filtra mídias ativas
+    this.filterActiveMedias(survey);
+
+    // 2. Calcula limite e respostas de cada bloco
+    const enrichedBlocks = await Promise.all(
+      survey.blocks.map(async (block: any) => {
+        let count = 0;
+        if (block.responseLimit !== null && block.responseLimit !== undefined) {
+          count = await prisma.surveyResponse.count({
+            where: {
+              surveyId: survey.id,
+              OR: [
+                { answers: { some: { question: { blockId: block.id } } } },
+                { blockTrackings: { some: { blockId: block.id } } }
+              ]
+            }
+          });
+        }
+
+        return {
+          ...block,
+          responsesCount: count,
+          isLimitReached: Boolean(
+            block.responseLimit !== null &&
+            block.responseLimit !== undefined &&
+            count >= block.responseLimit
+          )
+        };
+      })
+    );
+
+    survey.blocks = enrichedBlocks;
     return survey;
   }
 
@@ -70,7 +90,7 @@ export class PublicSurveyRepository {
       }
     });
 
-    return this.filterActiveMedias(survey);
+    return this.processSurveyForPublic(survey);
   }
 
   async findPublishedSurveyById(id: string) {
@@ -102,7 +122,7 @@ export class PublicSurveyRepository {
       }
     });
 
-    return this.filterActiveMedias(survey);
+    return this.processSurveyForPublic(survey);
   }
 
   async createParticipant(data: { name?: string, email?: string, phone?: string }) {
@@ -178,24 +198,10 @@ export class PublicSurveyRepository {
     if (!mediaIdToSave) {
       const questionMedias = await prisma.media.findMany({
         where: { questionId },
-        include: { _count: { select: { answers: true } } },
         orderBy: [{ orderIndex: 'asc' }, { createdAt: 'asc' }]
       });
       if (questionMedias.length > 0) {
-        const hasConditionalLimit = questionMedias.some(
-          m => m.responseLimit !== null && m.responseLimit !== undefined
-        );
-        if (hasConditionalLimit) {
-          const active = questionMedias.find(m => {
-            if (m.responseLimit !== null && m.responseLimit !== undefined) {
-              return m._count.answers < m.responseLimit;
-            }
-            return true;
-          }) || questionMedias[questionMedias.length - 1];
-          mediaIdToSave = active.id;
-        } else if (questionMedias.length === 1) {
-          mediaIdToSave = questionMedias[0].id;
-        }
+        mediaIdToSave = questionMedias[0].id;
       }
     }
 

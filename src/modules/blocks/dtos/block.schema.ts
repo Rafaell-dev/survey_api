@@ -2,15 +2,26 @@ import { z } from 'zod';
 
 export const createBlockSchema = z.object({
   title: z.string().max(255).optional(),
-  description: z.string().optional()
+  description: z.string().optional(),
+  responseLimit: z.number().int().min(1).max(9999).nullable().optional(),
+  fallbackBlockId: z.string().nullable().optional(),
+  showOnlyOnFallback: z.boolean().optional()
 });
 
 export const updateBlockSchema = z.object({
   title: z.string().max(255).optional(),
-  description: z.string().optional()
-}).refine(data => data.title !== undefined || data.description !== undefined, {
+  description: z.string().optional(),
+  responseLimit: z.number().int().min(1).max(9999).nullable().optional(),
+  fallbackBlockId: z.string().nullable().optional(),
+  showOnlyOnFallback: z.boolean().optional()
+}).refine(data => 
+  data.title !== undefined || 
+  data.description !== undefined || 
+  data.responseLimit !== undefined || 
+  data.fallbackBlockId !== undefined ||
+  data.showOnlyOnFallback !== undefined, {
   message: 'Pelo menos um campo deve ser enviado no payload',
-  path: ['title', 'description']
+  path: ['title', 'description', 'responseLimit', 'fallbackBlockId', 'showOnlyOnFallback']
 });
 
 export const reorderBlocksSchema = z.object({

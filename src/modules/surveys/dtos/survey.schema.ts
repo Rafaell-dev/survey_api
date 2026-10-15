@@ -50,6 +50,9 @@ export const syncSurveySchema = z.object({
     title: z.string().nullable().optional(),
     description: z.string().nullable().optional(),
     orderIndex: z.number().int(),
+    responseLimit: z.number().int().min(1).max(9999).nullable().optional(),
+    fallbackBlockId: z.string().nullable().optional(),
+    showOnlyOnFallback: z.boolean().optional(),
     questions: z.array(z.object({
       id: z.string(),
       isNew: z.boolean().optional(),

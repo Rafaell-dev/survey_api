@@ -1,4 +1,5 @@
 import { PublicSurveyRepository } from '../repositories/public-survey.repository';
+import { prisma } from '../../../lib/prisma';
 
 export class GetNextBlockService {
   constructor(private repository: PublicSurveyRepository) {}
@@ -22,12 +23,111 @@ export class GetNextBlockService {
       answersMap.set(ans.questionId, ans);
     }
 
-    let currentBlock = survey.blocks.find(b => b.orderIndex === 1);
+    // Calcula isLimitReached para cada bloco considerando outras respostas
+    const blocksWithLimits = await Promise.all(
+      survey.blocks.map(async (block: any) => {
+        let isLimitReached = false;
+        if (block.responseLimit !== null && block.responseLimit !== undefined) {
+          const count = await prisma.surveyResponse.count({
+            where: {
+              surveyId: survey.id,
+              id: { not: responseId },
+              OR: [
+                { answers: { some: { question: { blockId: block.id } } } },
+                { blockTrackings: { some: { blockId: block.id } } }
+              ]
+            }
+          });
+          isLimitReached = count >= block.responseLimit;
+        }
+
+        return {
+          ...block,
+          isLimitReached
+        };
+      })
+    );
+
+    const fallbackTargetBlockIds = new Set<string>();
+    const fallbackOriginsMap = new Map<string, any[]>();
+
+    for (const b of blocksWithLimits) {
+      if (b.fallbackBlockId) {
+        fallbackTargetBlockIds.add(b.fallbackBlockId);
+        const list = fallbackOriginsMap.get(b.fallbackBlockId) || [];
+        list.push(b);
+        fallbackOriginsMap.set(b.fallbackBlockId, list);
+      }
+    }
+
+    const shouldSkipInLinearFlow = (block: any) => {
+      const alreadyAnswered = block.questions.some((q: any) => answersMap.has(q.id));
+
+      // 1. Se atingiu o limite de respostas e o usuário não respondeu, pula no fluxo linear
+      if (block.isLimitReached && !alreadyAnswered) {
+        return true;
+      }
+
+      // 2. Se é exclusivo de fallback ou destino de fallback de limite
+      if (block.showOnlyOnFallback || fallbackTargetBlockIds.has(block.id)) {
+        const origins = fallbackOriginsMap.get(block.id) || [];
+        const anyOriginTriggered = origins.some((o: any) => o.isLimitReached);
+        if (!anyOriginTriggered && !alreadyAnswered) {
+          return true;
+        }
+      }
+
+      return false;
+    };
+
+    const findNextLinearBlock = (startOrderIndex: number) => {
+      const candidates = blocksWithLimits
+        .filter((b: any) => b.orderIndex >= startOrderIndex && !shouldSkipInLinearFlow(b))
+        .sort((a: any, b: any) => a.orderIndex - b.orderIndex);
+      return candidates[0] || null;
+    };
+
+    const resolveEffectiveBlock = (candidateBlock: any) => {
+      let block = candidateBlock;
+      let depth = 0;
+      const seen = new Set<string>();
+
+      while (block && depth < 10) {
+        if (seen.has(block.id)) break;
+        seen.add(block.id);
+
+        const alreadyAnswered = block.questions.some((q: any) => answersMap.has(q.id));
+        if (alreadyAnswered) {
+          break;
+        }
+
+        if (block.isLimitReached) {
+          if (block.fallbackBlockId) {
+            const fallback = blocksWithLimits.find((b: any) => b.id === block.fallbackBlockId);
+            if (fallback && fallback.id !== block.id) {
+              block = fallback;
+              depth++;
+              continue;
+            }
+          } else {
+            // Sem fallback: avança para o próximo bloco linear
+            block = findNextLinearBlock(block.orderIndex + 1);
+            depth++;
+            continue;
+          }
+        }
+
+        break;
+      }
+      return block;
+    };
+
+    let currentBlock = resolveEffectiveBlock(findNextLinearBlock(0));
     const visitedBlocks = new Set<string>();
 
     while (currentBlock) {
       if (visitedBlocks.has(currentBlock.id)) {
-        return { nextBlockId: null }; // Loop infinito de regras previnido
+        return { nextBlockId: null }; // Loop infinito de regras prevenido
       }
       visitedBlocks.add(currentBlock.id);
 
@@ -76,10 +176,10 @@ export class GetNextBlockService {
       }
 
       if (jumpToBlockId) {
-        currentBlock = survey.blocks.find(b => b.id === jumpToBlockId);
+        currentBlock = resolveEffectiveBlock(blocksWithLimits.find((b: any) => b.id === jumpToBlockId));
       } else {
-        const nextOrderIndex = currentBlock.orderIndex + 1;
-        currentBlock = survey.blocks.find(b => b.orderIndex === nextOrderIndex);
+        const nextLinear = findNextLinearBlock(currentBlock.orderIndex + 1);
+        currentBlock = resolveEffectiveBlock(nextLinear);
       }
     }
 

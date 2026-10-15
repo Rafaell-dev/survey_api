@@ -9,6 +9,7 @@ import { UpdateSurveySettingsService } from '../services/update-survey-settings.
 import { SyncSurveyService } from '../services/sync-survey.service';
 import { GetGlobalMetricsService } from '../services/get-global-metrics.service';
 import { PreviewSurveyService } from '../services/preview-survey.service';
+import { DuplicateSurveyService } from '../services/duplicate-survey.service';
 import { PublicSurveyRepository } from '../../public-surveys/repositories/public-survey.repository';
 import { createSurveySchema, listSurveysSchema, updateSurveySchema, updateSurveySettingsSchema, syncSurveySchema } from '../dtos/survey.schema';
 
@@ -134,6 +135,17 @@ export class SurveysController {
       const researcherId = (request.user as any).sub;
       const result = await service.execute(request.params.surveyId, researcherId);
       return reply.status(200).send(result);
+    } catch (err: any) {
+      return reply.status(err.status || 500).send({ message: err.message });
+    }
+  }
+
+  async duplicate(request: FastifyRequest<{ Params: { surveyId: string } }>, reply: FastifyReply) {
+    try {
+      const service = new DuplicateSurveyService();
+      const researcherId = (request.user as any).sub;
+      const result = await service.execute(request.params.surveyId, researcherId);
+      return reply.status(201).send(result);
     } catch (err: any) {
       return reply.status(err.status || 500).send({ message: err.message });
     }

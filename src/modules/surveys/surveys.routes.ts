@@ -21,6 +21,7 @@ export async function surveysRoutes(app: FastifyInstance) {
   app.patch('/:surveyId', surveysController.update.bind(surveysController));
   app.patch('/:surveyId/settings', surveysController.updateSettings.bind(surveysController));
   app.put('/:surveyId/sync', surveysController.sync.bind(surveysController));
+  app.post('/:surveyId/duplicate', surveysController.duplicate.bind(surveysController));
   app.delete('/:surveyId', surveysController.archive.bind(surveysController));
 
   // Analytics
